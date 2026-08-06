@@ -19,20 +19,14 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        if (app()->isProduction()) {
-            User::create([
-                'name' => 'Test User',
-                'email' => 'test@example.com',
-                'email_verified_at' => now(),
-                'password' => Hash::make('password'), // Silakan ubah password ini di production
-                'remember_token' => Str::random(10),
-            ]);
-        } else {
-            User::factory()->create([
-                'name' => 'Test User',
-                'email' => 'test@example.com',
-            ]);
-        }
+        User::create([
+            'name' => 'Test User',
+            'email' => 'test@example.com',
+            'email_verified_at' => now(),
+            'password' => Hash::make('password'), // Silakan ubah password ini sesuai kebutuhan
+            'remember_token' => Str::random(10),
+        ]);
     }
 }
+
 
