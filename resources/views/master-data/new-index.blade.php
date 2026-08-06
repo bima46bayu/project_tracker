@@ -393,10 +393,13 @@
                     <form @submit.prevent="submitForm">
                         
                         <!-- Common Name Field -->
-                        <div class="mb-4" x-show="modalType !== 'misc'">
-                            <label class="block text-xs font-medium text-slate-700 mb-1">Name *</label>
-                            <input type="text" x-model="formData.name" required class="w-full border border-slate-300 rounded px-4 py-2.5 text-sm focus:border-primary outline-none">
-                        </div>
+                        <template x-if="modalType !== 'misc'">
+                            <div class="mb-4">
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Name *</label>
+                                <input type="text" x-model="formData.name" required class="w-full border border-slate-300 rounded px-4 py-2.5 text-sm focus:border-primary outline-none">
+                            </div>
+                        </template>
+
 
                         <!-- Managers Only -->
                         <template x-if="modalType === 'managers'">
