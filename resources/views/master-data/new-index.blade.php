@@ -78,7 +78,17 @@
             },
 
             submitForm() {
-                let endpoint = this.modalType === 'managers' ? 'users' : this.modalType;
+                let endpoint = this.modalType;
+                let prop = this.modalType;
+                
+                if (this.modalType === 'managers') {
+                    endpoint = 'users';
+                    prop = 'managers';
+                } else if (this.modalType === 'misc') {
+                    endpoint = 'miscs';
+                    prop = 'miscs';
+                }
+                
                 let method = this.formData.id ? 'PUT' : 'POST';
                 let url = this.formData.id ? `/api/${endpoint}/${this.formData.id}` : `/api/${endpoint}`;
                 
@@ -91,7 +101,7 @@
                 }).then(result => {
                     if (result.ok) {
                         this.isModalOpen = false;
-                        this.fetchData(endpoint, this.modalType);
+                        this.fetchData(endpoint, prop);
                     } else {
                         if (result.status === 422 && result.body.errors) {
                             let msgs = Object.values(result.body.errors).flat();
@@ -104,6 +114,7 @@
                     this.errorMsg = 'Network error occurred.';
                 });
             },
+
 
             deleteItem(endpoint, id) {
                 if(!confirm('Are you sure?')) return;
