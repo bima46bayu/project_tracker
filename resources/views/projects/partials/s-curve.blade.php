@@ -33,7 +33,7 @@
         </div>
     </div>
     <div class="w-full overflow-x-auto">
-        <div class="h-[350px]" :style="{ width: sCurveViewMode === 'daily' ? (sCurveData.planned_curve ? (sCurveData.planned_curve.length * 60) + 'px' : '1000px') : '100%' }">
+        <div class="h-[350px]" :style="{ width: sCurveViewMode === 'daily' ? (sCurveData.planned_curve && sCurveData.planned_curve.length > 0 ? (sCurveData.planned_curve.length * 60) + 'px' : '100%') : '100%' }">
             <canvas id="scurveChart"></canvas>
         </div>
     </div>

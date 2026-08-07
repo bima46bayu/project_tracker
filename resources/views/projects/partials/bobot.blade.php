@@ -12,7 +12,7 @@
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-100">
-                <template x-for="ts in sCurveData.tasks_summary" :key="ts.id">
+                <template x-for="ts in (sCurveData.tasks_summary || [])" :key="ts.id">
                     <tr class="hover:bg-slate-50">
                         <td class="px-4 py-2 font-medium text-slate-700" x-text="ts.name"></td>
                         <td class="px-4 py-2 text-center text-slate-600 font-medium" x-text="parseFloat(ts.total_qty || 0).toLocaleString('id-ID')"></td>
@@ -20,7 +20,7 @@
                         <td class="px-4 py-2 font-bold text-primary text-right" x-text="ts.bobot + '%'"></td>
                     </tr>
                 </template>
-                <template x-if="!sCurveData.tasks_summary || sCurveData.tasks_summary.length === 0">
+                <template x-if="!sCurveData || !sCurveData.tasks_summary || sCurveData.tasks_summary.length === 0">
                     <tr>
                         <td colspan="4" class="px-4 py-6 text-center text-slate-500">Belum ada data bobot. Pastikan RAB telah diisi.</td>
                     </tr>
