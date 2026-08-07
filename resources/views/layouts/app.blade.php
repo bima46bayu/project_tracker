@@ -73,12 +73,12 @@
 <body x-data="{ mobileMenuOpen: false }" class="text-slate-800 font-sans h-screen flex antialiased overflow-hidden">
     
     <!-- Sidebar -->
-    <aside class="w-64 bg-white border-r border-slate-200 flex-shrink-0 h-screen hidden md:flex flex-col">
+    <aside class="w-64 bg-white border-r border-slate-200 flex-shrink-0 h-screen hidden lg:flex flex-col">
         @include('layouts.partials.sidebar')
     </aside>
 
     <!-- Mobile Sidebar Drawer -->
-    <div x-show="mobileMenuOpen" x-cloak class="relative z-50 md:hidden" role="dialog" aria-modal="true">
+    <div x-show="mobileMenuOpen" x-cloak class="relative z-50 lg:hidden" role="dialog" aria-modal="true">
         <!-- Background backdrop -->
         <div x-show="mobileMenuOpen" 
              x-transition:enter="transition-opacity ease-linear duration-300"
@@ -100,11 +100,11 @@
                  x-transition:leave-end="-translate-x-full"
                  class="relative flex w-full max-w-xs flex-1 flex-col bg-white pt-5 pb-4 h-full">
                 
-                <!-- Close button inside mobile menu -->
-                <div class="absolute top-0 right-0 -mr-12 pt-2">
-                    <button type="button" @click="mobileMenuOpen = false" class="ml-1 flex h-10 w-10 items-center justify-center rounded-full focus:outline-none focus:ring-2 focus:ring-white">
+                <!-- Close button inside mobile menu drawer -->
+                <div class="absolute top-4 right-4 z-10">
+                    <button type="button" @click="mobileMenuOpen = false" class="flex h-10 w-10 items-center justify-center rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-primary">
                         <span class="sr-only">Close sidebar</span>
-                        <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
                 </div>
 
@@ -116,7 +116,7 @@
     <!-- Main Content -->
     <main class="flex-1 flex flex-col min-h-screen overflow-hidden">
         <!-- Mobile Topbar -->
-        <header class="flex h-16 items-center justify-between border-b border-slate-200 bg-white px-4 md:hidden flex-shrink-0">
+        <header class="flex h-16 items-center justify-between border-b border-slate-200 bg-white px-4 lg:hidden flex-shrink-0">
             <div class="flex items-center">
                 <button type="button" @click="mobileMenuOpen = true" class="text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary p-2 -ml-2 rounded-md">
                     <span class="sr-only">Open sidebar</span>
@@ -127,6 +127,7 @@
             <!-- Profile initial -->
             <div class="w-8 h-8 rounded-full bg-slate-800 text-white flex items-center justify-center text-sm font-medium">N</div>
         </header>
+
 
         
         <div class="flex-1 overflow-auto bg-slate-50" 
