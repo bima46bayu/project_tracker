@@ -7,13 +7,13 @@
     <!-- MAIN PROJECT PAYMENT (IN) -->
     <div class="mb-8">
         <h3 class="text-lg font-bold text-slate-800 mb-4">Payment</h3>
-        <div class="flex items-center mb-4">
-            <label class="text-sm font-medium text-slate-700 w-32 shrink-0">Payment Term:</label>
-            <input type="text" x-model="project.payment_term" class="flex-1 border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none focus:border-primary" placeholder="e.g. 30% DP, 40% Progress, 30% Final">
+        <div class="flex flex-col sm:flex-row sm:items-center gap-2 mb-4">
+            <label class="text-sm font-medium text-slate-700 sm:w-32 shrink-0">Payment Term:</label>
+            <input type="text" x-model="project.payment_term" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none focus:border-primary" placeholder="e.g. 30% DP, 40% Progress, 30% Final">
         </div>
 
         <div class="overflow-x-auto border border-slate-100 rounded-lg bg-white shadow-sm mb-4">
-            <table class="min-w-full divide-y divide-slate-100">
+            <table class="min-w-[1000px] w-full divide-y divide-slate-100">
                 <thead class="bg-slate-50">
                     <tr>
                         <th class="px-4 py-3 text-center text-[10px] font-semibold text-slate-500 uppercase tracking-wider w-12">NO</th>
@@ -91,13 +91,13 @@
     <template x-for="subkon in (project.subkons || [])" :key="subkon.id">
         <div class="mb-8 pt-4 border-t border-slate-100">
             <h3 class="text-lg font-bold text-slate-800 mb-4" x-text="'Payment ' + subkon.name"></h3>
-            <div class="flex items-center mb-4">
-                <label class="text-sm font-medium text-slate-700 w-44 shrink-0">Payment Term Subcon:</label>
-                <input type="text" x-model="subkon.pivot.payment_term" class="flex-1 border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none focus:border-primary" placeholder="e.g. 50% DP, 50% Final">
+            <div class="flex flex-col sm:flex-row sm:items-center gap-2 mb-4">
+                <label class="text-sm font-medium text-slate-700 sm:w-44 shrink-0">Payment Term Subcon:</label>
+                <input type="text" x-model="subkon.pivot.payment_term" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none focus:border-primary" placeholder="e.g. 50% DP, 50% Final">
             </div>
 
             <div class="overflow-x-auto border border-slate-100 rounded-lg bg-white shadow-sm mb-4">
-                <table class="min-w-full divide-y divide-slate-100">
+                <table class="min-w-[1000px] w-full divide-y divide-slate-100">
                     <thead class="bg-slate-50">
                         <tr>
                             <th class="px-4 py-3 text-center text-[10px] font-semibold text-slate-500 uppercase tracking-wider w-12">NO</th>

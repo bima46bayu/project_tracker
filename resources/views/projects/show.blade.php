@@ -5,14 +5,16 @@
 <div x-data="projectTracker({{ $project->id }})" class="min-h-screen bg-white">
     
     <!-- Header Summary (Matching Reference) -->
-    <div class="px-4 sm:px-8 pt-6 pb-2">
-        <div class="flex items-center mb-2">
-            <a href="{{ route('projects.index') }}" class="text-slate-400 hover:text-slate-600 mr-4">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-            </a>
-            <h1 class="text-xl font-bold text-slate-900 mr-4">{{ $project->name }}</h1>
+    <div class="px-3 sm:px-8 pt-4 pb-2">
+        <div class="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
+            <div class="flex items-center">
+                <a href="{{ route('projects.index') }}" class="text-slate-400 hover:text-slate-600 mr-2 sm:mr-4 flex-shrink-0">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                </a>
+                <h1 class="text-lg sm:text-xl font-bold text-slate-900 mr-2 sm:mr-4 leading-tight">{{ $project->name }}</h1>
+            </div>
             
-            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-medium border"
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-medium border self-start sm:self-auto"
                   :class="{
                       'bg-emerald-50 text-emerald-600 border-emerald-100': computedProjectStatus === 'FINISH' || computedProjectStatus === 'DONE',
                       'bg-slate-50 text-slate-600 border-slate-200': computedProjectStatus === 'NOT_STARTED',
@@ -22,16 +24,15 @@
                 (<span x-text="sCurveData && sCurveData.current_actual_progress !== undefined ? parseFloat(sCurveData.current_actual_progress).toFixed(1) : (project.progress || 0)"></span>%)
             </span>
         </div>
-        <div class="flex items-center text-xs text-slate-500 pl-9 space-x-2">
+        <div class="flex items-center text-xs text-slate-500 pl-6 sm:pl-9 space-x-2">
             <span class="uppercase font-medium">{{ $project->project_code }}</span>
             <span class="text-slate-300">•</span>
             <span class="font-medium text-slate-600">{{ $project->customer ? $project->customer->name : '-' }}</span>
         </div>
     </div>
-
     <!-- Tabs (Matching Reference) -->
-    <div class="px-4 sm:px-8 border-b border-slate-200 mt-6 relative">
-        <nav class="-mb-px flex space-x-8 text-sm overflow-x-auto whitespace-nowrap hide-scrollbar pb-1">
+    <div class="px-3 sm:px-8 border-b border-slate-200 mt-4 sm:mt-6 relative">
+        <nav class="-mb-px flex flex-row flex-nowrap space-x-4 sm:space-x-8 text-xs sm:text-sm overflow-x-auto whitespace-nowrap hide-scrollbar pb-1">
             <button @click="activeTab = 'overview'" :class="activeTab === 'overview' ? 'border-primary text-primary font-medium' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'" class="whitespace-nowrap pb-3 border-b-2 transition-colors flex items-center">
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                 Overview
@@ -56,23 +57,23 @@
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                 Bobot Project
             </button>
-            <a href="#" @click.prevent="activeTab = 's-curve'" class="whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm transition-colors" :class="activeTab === 's-curve' ? 'border-primary text-primary' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'">
-            <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path></svg>
-            S-Curve
-        </a>
-        <a href="#" @click.prevent="activeTab = 'issues'" class="whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm transition-colors" :class="activeTab === 'issues' ? 'border-primary text-primary' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'">
-            <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-            Issues
-        </a>
-        <a href="#" @click.prevent="activeTab = 'settings'" class="whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm transition-colors" :class="activeTab === 'settings' ? 'border-primary text-primary' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'">
-                <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            <a href="#" @click.prevent="activeTab = 's-curve'" class="whitespace-nowrap pb-3 border-b-2 font-medium text-xs sm:text-sm transition-colors flex items-center" :class="activeTab === 's-curve' ? 'border-primary text-primary' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path></svg>
+                S-Curve
+            </a>
+            <a href="#" @click.prevent="activeTab = 'issues'" class="whitespace-nowrap pb-3 border-b-2 font-medium text-xs sm:text-sm transition-colors flex items-center" :class="activeTab === 'issues' ? 'border-primary text-primary' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                Issues
+            </a>
+            <a href="#" @click.prevent="activeTab = 'settings'" class="whitespace-nowrap pb-3 border-b-2 font-medium text-xs sm:text-sm transition-colors flex items-center" :class="activeTab === 'settings' ? 'border-primary text-primary' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.11-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                 Settings
             </a>
         </nav>
     </div>
 
     <!-- Tab Contents Container -->
-    <div class="px-4 py-4 md:px-8 md:py-6 bg-slate-50 min-h-screen">
+    <div class="px-3 py-3 sm:px-6 sm:py-4 md:px-8 md:py-6 bg-slate-50 min-h-screen">
         
         <!-- Overview Tab (Matches the Reference Image exactly) -->
         <div x-show="activeTab === 'overview'" x-cloak class="space-y-6">
@@ -326,7 +327,13 @@
                     create: false,
                     onChange: (value) => {
                         if (this.project) {
-                            this.project[valueProp] = isMultiple ? (value ? value.split(',') : []) : value;
+                            if (isMultiple) {
+                                this.project[valueProp] = Array.isArray(value) 
+                                    ? value 
+                                    : (value ? value.split(',') : []);
+                            } else {
+                                this.project[valueProp] = value;
+                            }
                         }
                     }
                 });

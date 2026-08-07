@@ -7,16 +7,16 @@
     </div>
     
     <div class="overflow-x-auto border border-slate-100 rounded">
-        <table class="min-w-full divide-y divide-slate-100 table-fixed">
+        <table class="min-w-[900px] w-full divide-y divide-slate-100 table-fixed">
             <thead class="bg-slate-50">
                 <tr>
                     <th class="px-3 py-2.5 text-center text-[10px] font-semibold text-slate-500 uppercase tracking-wider w-10">NO</th>
                     <th class="px-4 py-2.5 text-left text-[10px] font-semibold text-slate-500 uppercase tracking-wider w-20">ITEM ID</th>
-                    <th class="px-4 py-2.5 text-left text-[10px] font-semibold text-slate-500 uppercase tracking-wider">ITEM</th>
+                    <th class="px-4 py-2.5 text-left text-[10px] font-semibold text-slate-500 uppercase tracking-wider w-60">ITEM</th>
                     <th class="px-4 py-2.5 text-left text-[10px] font-semibold text-slate-500 uppercase tracking-wider w-24">SATUAN</th>
                     <th class="px-4 py-2.5 text-center text-[10px] font-semibold text-slate-500 uppercase tracking-wider w-20">QTY</th>
-                    <th class="px-4 py-2.5 text-right text-[10px] font-semibold text-slate-500 uppercase tracking-wider w-64">HARGA SATUAN</th>
-                    <th class="px-4 py-2.5 text-right text-[10px] font-semibold text-slate-500 uppercase tracking-wider w-64">TOTAL HARGA</th>
+                    <th class="px-4 py-2.5 text-right text-[10px] font-semibold text-slate-500 uppercase tracking-wider w-40">HARGA SATUAN</th>
+                    <th class="px-4 py-2.5 text-right text-[10px] font-semibold text-slate-500 uppercase tracking-wider w-40">TOTAL HARGA</th>
                     <th class="px-3 py-2.5 text-center w-10"></th>
                 </tr>
             </thead>
