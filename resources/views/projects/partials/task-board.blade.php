@@ -109,7 +109,7 @@
             <!-- Background overlay -->
             <div x-show="showTaskSlideover" @click="closeSlideover()" x-transition.opacity.duration.300ms class="absolute inset-0 bg-slate-900 bg-opacity-30 backdrop-blur-sm transition-opacity" aria-hidden="true"></div>
 
-            <div class="fixed inset-y-0 right-0 w-full md:w-1/2 flex">
+            <div class="fixed inset-y-0 right-0 max-w-full flex">
                 <!-- Slide-over panel -->
                 <div x-show="showTaskSlideover" 
                      x-transition:enter="transform transition ease-in-out duration-300 sm:duration-500" 
@@ -118,7 +118,7 @@
                      x-transition:leave="transform transition ease-in-out duration-300 sm:duration-500" 
                      x-transition:leave-start="translate-x-0" 
                      x-transition:leave-end="translate-x-full" 
-                     class="w-full">
+                     class="w-screen max-w-full sm:max-w-md md:max-w-2xl lg:max-w-4xl">
                      
                     <div class="h-full flex flex-col bg-white shadow-2xl overflow-y-scroll">
                         <!-- Header -->
@@ -139,20 +139,20 @@
                             <div>
                                 <input type="text" x-model="activeTask.name" class="w-full text-xl font-bold text-slate-800 border border-slate-300 rounded-lg px-4 py-2 mb-6 hover:border-slate-400 focus:border-primary focus:ring-1 focus:ring-primary/30 transition-all bg-white shadow-sm" placeholder="Task Name...">
                                 
-                                <div class="grid grid-cols-2 gap-y-4 gap-x-8">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8">
                                     <div class="flex items-center">
-                                        <svg class="w-4 h-4 text-slate-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                        <span class="text-xs font-medium text-slate-500 w-20">Start Date</span>
+                                        <svg class="w-4 h-4 text-slate-400 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                        <span class="text-xs font-medium text-slate-500 w-20 flex-shrink-0">Start Date</span>
                                         <input type="text" x-init="flatpickr($el, { dateFormat: 'Y-m-d' })" x-model="activeTask.start_date" class="flex-1 text-sm border border-slate-300 hover:border-slate-400 focus:border-primary rounded-md py-1.5 px-3 outline-none transition-colors cursor-pointer shadow-sm bg-white" placeholder="Select date...">
                                     </div>
                                     <div class="flex items-center">
-                                        <svg class="w-4 h-4 text-slate-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                        <span class="text-xs font-medium text-slate-500 w-20">End Date</span>
+                                        <svg class="w-4 h-4 text-slate-400 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                        <span class="text-xs font-medium text-slate-500 w-20 flex-shrink-0">End Date</span>
                                         <input type="text" x-init="flatpickr($el, { dateFormat: 'Y-m-d' })" x-model="activeTask.end_date" class="flex-1 text-sm border border-slate-300 hover:border-slate-400 focus:border-primary rounded-md py-1.5 px-3 outline-none transition-colors cursor-pointer shadow-sm bg-white" placeholder="Select date...">
                                     </div>
                                     <div class="flex items-center">
-                                        <svg class="w-4 h-4 text-slate-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                        <span class="text-xs font-medium text-slate-500 w-20">Status</span>
+                                        <svg class="w-4 h-4 text-slate-400 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                        <span class="text-xs font-medium text-slate-500 w-20 flex-shrink-0">Status</span>
                                         <select x-model="activeTask.status" disabled class="flex-1 text-sm border border-slate-300 hover:border-slate-400 rounded-md py-1.5 px-3 shadow-sm outline-none font-medium bg-slate-50 opacity-70 cursor-not-allowed"
                                             :class="{
                                                 'text-slate-600': activeTask.status === 'TODO',
@@ -165,8 +165,8 @@
                                         </select>
                                     </div>
                                     <div class="flex items-center">
-                                        <svg class="w-4 h-4 text-slate-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                        <span class="text-xs font-medium text-slate-500 w-20">Priority</span>
+                                        <svg class="w-4 h-4 text-slate-400 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                        <span class="text-xs font-medium text-slate-500 w-20 flex-shrink-0">Priority</span>
                                         <select x-model="activeTask.priority" class="flex-1 text-sm border border-slate-300 hover:border-slate-400 focus:border-primary shadow-sm rounded-md py-1.5 px-3 cursor-pointer outline-none transition-colors font-medium bg-white"
                                             :class="{
                                                 'text-slate-600': activeTask.priority === 'LOW',
@@ -207,7 +207,7 @@
                                 </div>
 
                                 <div class="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-sm overflow-x-auto">
-                                    <table class="min-w-full divide-y divide-slate-200">
+                                    <table class="min-w-[900px] w-full divide-y divide-slate-200">
                                         <thead class="bg-slate-50">
                                             <tr>
                                                 <th class="px-3 py-2 text-left text-[10px] font-semibold text-slate-500 uppercase tracking-wider min-w-[150px]">Item</th>
