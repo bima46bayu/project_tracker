@@ -15,8 +15,8 @@
         <div class="col-span-4">Task Name</div>
         <div class="col-span-2">Total RAB</div>
         <div class="col-span-2">Status</div>
-        <div class="col-span-3">Timeline</div>
-        <div class="col-span-1">Priority</div>
+        <div class="col-span-2">Timeline</div>
+        <div class="col-span-2">Priority</div>
     </div>
 
     <template x-if="!project.tasks || project.tasks.length === 0">
@@ -81,13 +81,13 @@
                         </div>
 
                         <!-- Timeline -->
-                        <div class="col-span-3 text-xs text-slate-500 flex items-center font-medium">
+                        <div class="col-span-2 text-xs text-slate-500 flex items-center font-medium">
                             <svg class="w-3.5 h-3.5 mr-1.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                             <span x-text="formatDateShort(task.start_date) + ' → ' + formatDateShort(task.end_date)"></span>
                         </div>
 
                         <!-- Priority Badge -->
-                        <div class="col-span-1 flex items-center">
+                        <div class="col-span-2 flex items-center">
                             <span class="px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider" 
                                   :class="{
                                       'bg-slate-100 text-slate-600': !task.priority || task.priority === 'LOW',
