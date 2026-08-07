@@ -2,17 +2,18 @@
 @section('title', 'Projects')
 
 @section('content')
-<div class="px-8 py-6">
-    <div class="flex justify-between items-center mb-6">
+<div class="px-4 py-4 md:px-8 md:py-6">
+    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
         <div>
             <h2 class="text-xl font-bold text-slate-900">Projects</h2>
             <p class="text-slate-500 text-sm mt-1">Manage all your construction projects here.</p>
         </div>
-        <a href="{{ route('projects.create') }}" class="bg-primary hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-sm transition-colors flex items-center">
+        <a href="{{ route('projects.create') }}" class="bg-primary hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-sm transition-colors flex items-center self-start sm:self-auto">
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
             New Project
         </a>
     </div>
+
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         @forelse($projects as $project)

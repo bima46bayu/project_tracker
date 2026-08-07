@@ -72,14 +72,14 @@
     </div>
 
     <!-- Tab Contents Container -->
-    <div class="px-8 py-6 bg-slate-50 min-h-screen">
+    <div class="px-4 py-4 md:px-8 md:py-6 bg-slate-50 min-h-screen">
         
         <!-- Overview Tab (Matches the Reference Image exactly) -->
         <div x-show="activeTab === 'overview'" x-cloak class="space-y-6">
             <!-- Project Details Card -->
             <div class="clean-card p-6">
                 <h2 class="text-sm font-bold text-slate-800 mb-6">Project Details</h2>
-                <div class="grid grid-cols-3 gap-y-6 gap-x-12">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-y-6 gap-x-12">
                     <div>
                         <p class="text-[10px] text-slate-500 font-medium tracking-wider mb-1">PROJECT ID</p>
                         <p class="text-sm font-medium text-slate-900">{{ $project->project_code }}</p>
@@ -146,7 +146,7 @@
                     <p class="text-xs text-amber-700">Status is set automatically: from <strong>Bobot Project</strong> total % (→ Finish at 100%); <strong>Done</strong> when all payments are lunas. This section cannot be edited.</p>
                 </div>
 
-                <div class="flex space-x-2 mb-6">
+                <div class="flex flex-wrap gap-2 mb-6">
                     <button class="px-4 py-1.5 border rounded text-sm transition-colors" :class="computedProjectStatus === 'NOT_STARTED' ? 'border-2 border-primary bg-primary-light font-medium text-primary' : 'border-slate-200 text-slate-400 cursor-not-allowed'">Not Started</button>
                     <button class="px-4 py-1.5 border rounded text-sm transition-colors" :class="computedProjectStatus === 'ONGOING' ? 'border-2 border-primary bg-primary-light font-medium text-primary' : 'border-slate-200 text-slate-400 cursor-not-allowed'">Ongoing</button>
                     <button class="px-4 py-1.5 border rounded text-sm transition-colors" :class="computedProjectStatus === 'FINISH' ? 'border-2 border-emerald-500 bg-emerald-50 font-medium text-emerald-600' : 'border-slate-200 text-slate-400 cursor-not-allowed'">Finish</button>

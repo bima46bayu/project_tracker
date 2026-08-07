@@ -5,7 +5,7 @@
 
 
 
-<div class="px-8 py-6 bg-slate-50 min-h-screen">
+<div class="px-4 py-4 md:px-8 md:py-6 bg-slate-50 min-h-screen">
     <div class="mb-6 flex items-center">
         <a href="{{ route('projects.index') }}" class="text-slate-400 hover:text-slate-600 mr-4">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
@@ -16,7 +16,7 @@
         </div>
     </div>
 
-    <div class="clean-card p-8 shadow-sm">
+    <div class="clean-card p-4 sm:p-6 md:p-8 shadow-sm">
         <form action="{{ route('projects.store') }}" method="POST">
             @csrf
             
@@ -28,7 +28,7 @@
                 </div>
 
                 <!-- RIGHT COLUMN -->
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-2">Tanggal Mulai <span class="text-red-500">*</span></label>
                         <input type="text" x-data x-init="flatpickr($el, { dateFormat: 'Y-m-d' })" name="start_date" required class="w-full border border-slate-200 rounded px-4 py-2.5 text-sm focus:ring-1 focus:ring-primary focus:border-primary outline-none bg-white cursor-pointer" placeholder="Pilih tanggal...">
@@ -38,6 +38,7 @@
                         <input type="text" x-data x-init="flatpickr($el, { dateFormat: 'Y-m-d' })" name="end_date" required class="w-full border border-slate-200 rounded px-4 py-2.5 text-sm focus:ring-1 focus:ring-primary focus:border-primary outline-none bg-white cursor-pointer" placeholder="Pilih tanggal...">
                     </div>
                 </div>
+
 
                 <!-- LEFT COLUMN -->
                 <div>

@@ -149,15 +149,15 @@
         document.addEventListener('alpine:init', initMasterDataApp);
     }
 </script>
-<div x-data="masterDataApp()" class="px-8 py-6 min-h-screen bg-white">
+<div x-data="masterDataApp()" class="px-4 py-4 md:px-8 md:py-6 min-h-screen bg-white">
     <div class="mb-2">
         <h2 class="text-xl font-bold text-slate-900">Master Data</h2>
         <p class="text-sm text-slate-500">Manage Account Managers, Project Managers, Customers, and Subkons</p>
     </div>
 
     <!-- Tabs -->
-    <div class="mb-6 border-b border-slate-200 mt-6">
-        <nav class="-mb-px flex space-x-8 text-sm">
+    <div class="mb-6 border-b border-slate-200 mt-6 overflow-x-auto scrollbar-none">
+        <nav class="-mb-px flex space-x-8 text-sm min-w-max">
             <button @click="activeTab = 'managers'" :class="activeTab === 'managers' ? 'border-primary text-primary font-medium' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'" class="whitespace-nowrap pb-3 px-1 border-b-2 transition-colors flex items-center">
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                 Account & Project Managers
@@ -191,40 +191,42 @@
                     + Add Manager
                 </button>
             </div>
-            <table class="min-w-full divide-y divide-slate-100 border border-slate-100 rounded">
-                <thead class="bg-slate-50">
-                    <tr>
-                        <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Name</th>
-                        <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Type</th>
-                        <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Email</th>
-                        <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Phone</th>
-                        <th class="px-4 py-3 text-right text-[10px] font-bold text-primary uppercase tracking-wider">Actions</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-100 text-sm">
-                    <template x-for="item in managers" :key="item.id">
-                        <tr class="hover:bg-slate-50">
-                            <td class="px-4 py-3 text-slate-800 font-medium" x-text="item.name"></td>
-                            <td class="px-4 py-3">
-                                <span class="px-2 py-0.5 rounded text-[10px] font-medium border" 
-                                      :class="item.type === 'PM' ? 'bg-indigo-50 text-indigo-600 border-indigo-200' : 'bg-emerald-50 text-emerald-600 border-emerald-200'" 
-                                      x-text="item.type"></span>
-                            </td>
-                            <td class="px-4 py-3 text-slate-500" x-text="item.email"></td>
-                            <td class="px-4 py-3 text-slate-500" x-text="item.phone || '-'"></td>
-                            <td class="px-4 py-3 text-right space-x-3">
-                                <button @click="resetPassword(item.id)" class="text-[11px] text-amber-500 font-medium hover:underline">Reset Password</button>
-                                <button @click="editItem('managers', item)" class="text-blue-500 hover:text-blue-700">
-                                    <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                                </button>
-                                <button @click="deleteItem('users', item.id)" class="text-slate-400 hover:text-red-500">
-                                    <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                </button>
-                            </td>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-slate-100 border border-slate-100 rounded">
+                    <thead class="bg-slate-50">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Name</th>
+                            <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Type</th>
+                            <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Email</th>
+                            <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Phone</th>
+                            <th class="px-4 py-3 text-right text-[10px] font-bold text-primary uppercase tracking-wider">Actions</th>
                         </tr>
-                    </template>
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 text-sm">
+                        <template x-for="item in managers" :key="item.id">
+                            <tr class="hover:bg-slate-50">
+                                <td class="px-4 py-3 text-slate-800 font-medium" x-text="item.name"></td>
+                                <td class="px-4 py-3">
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-medium border" 
+                                          :class="item.type === 'PM' ? 'bg-indigo-50 text-indigo-600 border-indigo-200' : 'bg-emerald-50 text-emerald-600 border-emerald-200'" 
+                                          x-text="item.type"></span>
+                                </td>
+                                <td class="px-4 py-3 text-slate-500" x-text="item.email"></td>
+                                <td class="px-4 py-3 text-slate-500" x-text="item.phone || '-'"></td>
+                                <td class="px-4 py-3 text-right space-x-3">
+                                    <button @click="resetPassword(item.id)" class="text-[11px] text-amber-500 font-medium hover:underline">Reset Password</button>
+                                    <button @click="editItem('managers', item)" class="text-blue-500 hover:text-blue-700">
+                                        <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                    </button>
+                                    <button @click="deleteItem('users', item.id)" class="text-slate-400 hover:text-red-500">
+                                        <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                    </button>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <!-- Customers Tab -->
@@ -234,39 +236,41 @@
                     + Add Customer
                 </button>
             </div>
-            <table class="min-w-full divide-y divide-slate-100 border border-slate-100 rounded">
-                <thead class="bg-slate-50">
-                    <tr>
-                        <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Customer ID</th>
-                        <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Name</th>
-                        <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">PIC</th>
-                        <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Email</th>
-                        <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Phone</th>
-                        <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Address</th>
-                        <th class="px-4 py-3 text-right text-[10px] font-bold text-primary uppercase tracking-wider">Actions</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-100 text-sm">
-                    <template x-for="item in customers" :key="item.id">
-                        <tr class="hover:bg-slate-50">
-                            <td class="px-4 py-3 text-slate-500 text-xs font-medium" x-text="item.customer_code"></td>
-                            <td class="px-4 py-3 text-slate-800 font-medium" x-text="item.name"></td>
-                            <td class="px-4 py-3 text-slate-500" x-text="item.pic || '-'"></td>
-                            <td class="px-4 py-3 text-slate-500" x-text="item.email || '-'"></td>
-                            <td class="px-4 py-3 text-slate-500" x-text="item.phone || '-'"></td>
-                            <td class="px-4 py-3 text-slate-500 text-xs" x-text="item.address || '-'"></td>
-                            <td class="px-4 py-3 text-right space-x-2">
-                                <button @click="editItem('customers', item)" class="text-blue-500 hover:text-blue-700">
-                                    <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                                </button>
-                                <button @click="deleteItem('customers', item.id)" class="text-slate-400 hover:text-red-500">
-                                    <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                </button>
-                            </td>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-slate-100 border border-slate-100 rounded">
+                    <thead class="bg-slate-50">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Customer ID</th>
+                            <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Name</th>
+                            <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">PIC</th>
+                            <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Email</th>
+                            <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Phone</th>
+                            <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Address</th>
+                            <th class="px-4 py-3 text-right text-[10px] font-bold text-primary uppercase tracking-wider">Actions</th>
                         </tr>
-                    </template>
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 text-sm">
+                        <template x-for="item in customers" :key="item.id">
+                            <tr class="hover:bg-slate-50">
+                                <td class="px-4 py-3 text-slate-500 text-xs font-medium" x-text="item.customer_code"></td>
+                                <td class="px-4 py-3 text-slate-800 font-medium" x-text="item.name"></td>
+                                <td class="px-4 py-3 text-slate-500" x-text="item.pic || '-'"></td>
+                                <td class="px-4 py-3 text-slate-500" x-text="item.email || '-'"></td>
+                                <td class="px-4 py-3 text-slate-500" x-text="item.phone || '-'"></td>
+                                <td class="px-4 py-3 text-slate-500 text-xs" x-text="item.address || '-'"></td>
+                                <td class="px-4 py-3 text-right space-x-2">
+                                    <button @click="editItem('customers', item)" class="text-blue-500 hover:text-blue-700">
+                                        <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                    </button>
+                                    <button @click="deleteItem('customers', item.id)" class="text-slate-400 hover:text-red-500">
+                                        <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                    </button>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <!-- Subkons Tab -->
@@ -276,39 +280,41 @@
                     + Add Subkon
                 </button>
             </div>
-            <table class="min-w-full divide-y divide-slate-100 border border-slate-100 rounded">
-                <thead class="bg-slate-50">
-                    <tr>
-                        <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Subkon ID</th>
-                        <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Name</th>
-                        <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">PIC</th>
-                        <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Email</th>
-                        <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Phone</th>
-                        <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Address</th>
-                        <th class="px-4 py-3 text-right text-[10px] font-bold text-primary uppercase tracking-wider">Actions</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-100 text-sm">
-                    <template x-for="item in subkons" :key="item.id">
-                        <tr class="hover:bg-slate-50">
-                            <td class="px-4 py-3 text-slate-500 text-xs font-medium" x-text="item.subkon_code"></td>
-                            <td class="px-4 py-3 text-slate-800 font-medium" x-text="item.name"></td>
-                            <td class="px-4 py-3 text-slate-500" x-text="item.pic || '-'"></td>
-                            <td class="px-4 py-3 text-slate-500" x-text="item.email || '-'"></td>
-                            <td class="px-4 py-3 text-slate-500" x-text="item.phone || '-'"></td>
-                            <td class="px-4 py-3 text-slate-500 text-xs" x-text="item.address || '-'"></td>
-                            <td class="px-4 py-3 text-right space-x-2">
-                                <button @click="editItem('subkons', item)" class="text-blue-500 hover:text-blue-700">
-                                    <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                                </button>
-                                <button @click="deleteItem('subkons', item.id)" class="text-slate-400 hover:text-red-500">
-                                    <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                </button>
-                            </td>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-slate-100 border border-slate-100 rounded">
+                    <thead class="bg-slate-50">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Subkon ID</th>
+                            <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Name</th>
+                            <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">PIC</th>
+                            <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Email</th>
+                            <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Phone</th>
+                            <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Address</th>
+                            <th class="px-4 py-3 text-right text-[10px] font-bold text-primary uppercase tracking-wider">Actions</th>
                         </tr>
-                    </template>
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 text-sm">
+                        <template x-for="item in subkons" :key="item.id">
+                            <tr class="hover:bg-slate-50">
+                                <td class="px-4 py-3 text-slate-500 text-xs font-medium" x-text="item.subkon_code"></td>
+                                <td class="px-4 py-3 text-slate-800 font-medium" x-text="item.name"></td>
+                                <td class="px-4 py-3 text-slate-500" x-text="item.pic || '-'"></td>
+                                <td class="px-4 py-3 text-slate-500" x-text="item.email || '-'"></td>
+                                <td class="px-4 py-3 text-slate-500" x-text="item.phone || '-'"></td>
+                                <td class="px-4 py-3 text-slate-500 text-xs" x-text="item.address || '-'"></td>
+                                <td class="px-4 py-3 text-right space-x-2">
+                                    <button @click="editItem('subkons', item)" class="text-blue-500 hover:text-blue-700">
+                                        <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                    </button>
+                                    <button @click="deleteItem('subkons', item.id)" class="text-slate-400 hover:text-red-500">
+                                        <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                    </button>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <!-- Bowheers Tab -->
@@ -318,39 +324,41 @@
                     + Add Bowheer
                 </button>
             </div>
-            <table class="min-w-full divide-y divide-slate-100 border border-slate-100 rounded">
-                <thead class="bg-slate-50">
-                    <tr>
-                        <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Bowheer ID</th>
-                        <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Name</th>
-                        <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">PIC (Person in Charge)</th>
-                        <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Email</th>
-                        <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">No HP</th>
-                        <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Address</th>
-                        <th class="px-4 py-3 text-right text-[10px] font-bold text-primary uppercase tracking-wider">Actions</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-100 text-sm">
-                    <template x-for="item in bowheers" :key="item.id">
-                        <tr class="hover:bg-slate-50">
-                            <td class="px-4 py-3 text-slate-500 text-xs font-medium" x-text="item.bowheer_code"></td>
-                            <td class="px-4 py-3 text-slate-800 font-medium" x-text="item.name"></td>
-                            <td class="px-4 py-3 text-slate-500" x-text="item.pic || '-'"></td>
-                            <td class="px-4 py-3 text-slate-500" x-text="item.email || '-'"></td>
-                            <td class="px-4 py-3 text-slate-500" x-text="item.phone || '-'"></td>
-                            <td class="px-4 py-3 text-slate-500 text-xs" x-text="item.address || '-'"></td>
-                            <td class="px-4 py-3 text-right space-x-2">
-                                <button @click="editItem('bowheers', item)" class="text-blue-500 hover:text-blue-700">
-                                    <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                                </button>
-                                <button @click="deleteItem('bowheers', item.id)" class="text-slate-400 hover:text-red-500">
-                                    <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                </button>
-                            </td>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-slate-100 border border-slate-100 rounded">
+                    <thead class="bg-slate-50">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Bowheer ID</th>
+                            <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Name</th>
+                            <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">PIC (Person in Charge)</th>
+                            <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Email</th>
+                            <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">No HP</th>
+                            <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Address</th>
+                            <th class="px-4 py-3 text-right text-[10px] font-bold text-primary uppercase tracking-wider">Actions</th>
                         </tr>
-                    </template>
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 text-sm">
+                        <template x-for="item in bowheers" :key="item.id">
+                            <tr class="hover:bg-slate-50">
+                                <td class="px-4 py-3 text-slate-500 text-xs font-medium" x-text="item.bowheer_code"></td>
+                                <td class="px-4 py-3 text-slate-800 font-medium" x-text="item.name"></td>
+                                <td class="px-4 py-3 text-slate-500" x-text="item.pic || '-'"></td>
+                                <td class="px-4 py-3 text-slate-500" x-text="item.email || '-'"></td>
+                                <td class="px-4 py-3 text-slate-500" x-text="item.phone || '-'"></td>
+                                <td class="px-4 py-3 text-slate-500 text-xs" x-text="item.address || '-'"></td>
+                                <td class="px-4 py-3 text-right space-x-2">
+                                    <button @click="editItem('bowheers', item)" class="text-blue-500 hover:text-blue-700">
+                                        <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                    </button>
+                                    <button @click="deleteItem('bowheers', item.id)" class="text-slate-400 hover:text-red-500">
+                                        <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                    </button>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <!-- Misc Tab (e.g., Jenis Project) -->
@@ -360,33 +368,35 @@
                     + Add Jenis Project
                 </button>
             </div>
-            <table class="min-w-full divide-y divide-slate-100 border border-slate-100 rounded">
-                <thead class="bg-slate-50">
-                    <tr>
-                        <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Value</th>
-                        <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Type</th>
-                        <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Display Order</th>
-                        <th class="px-4 py-3 text-right text-[10px] font-bold text-primary uppercase tracking-wider">Actions</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-100 text-sm">
-                    <template x-for="item in miscs" :key="item.id">
-                        <tr class="hover:bg-slate-50">
-                            <td class="px-4 py-3 text-slate-800 font-medium" x-text="item.value"></td>
-                            <td class="px-4 py-3 text-slate-500 text-xs uppercase" x-text="item.type"></td>
-                            <td class="px-4 py-3 text-slate-500" x-text="item.display_order"></td>
-                            <td class="px-4 py-3 text-right space-x-2">
-                                <button @click="editItem('misc', item)" class="text-blue-500 hover:text-blue-700">
-                                    <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                                </button>
-                                <button @click="deleteItem('miscs', item.id)" class="text-slate-400 hover:text-red-500">
-                                    <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                </button>
-                            </td>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-slate-100 border border-slate-100 rounded">
+                    <thead class="bg-slate-50">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Value</th>
+                            <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Type</th>
+                            <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Display Order</th>
+                            <th class="px-4 py-3 text-right text-[10px] font-bold text-primary uppercase tracking-wider">Actions</th>
                         </tr>
-                    </template>
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 text-sm">
+                        <template x-for="item in miscs" :key="item.id">
+                            <tr class="hover:bg-slate-50">
+                                <td class="px-4 py-3 text-slate-800 font-medium" x-text="item.value"></td>
+                                <td class="px-4 py-3 text-slate-500 text-xs uppercase" x-text="item.type"></td>
+                                <td class="px-4 py-3 text-slate-500" x-text="item.display_order"></td>
+                                <td class="px-4 py-3 text-right space-x-2">
+                                    <button @click="editItem('misc', item)" class="text-blue-500 hover:text-blue-700">
+                                        <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                    </button>
+                                    <button @click="deleteItem('miscs', item.id)" class="text-slate-400 hover:text-red-500">
+                                        <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                    </button>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
