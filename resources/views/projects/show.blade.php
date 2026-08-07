@@ -73,7 +73,7 @@
     </div>
 
     <!-- Tab Contents Container -->
-    <div class="px-3 py-3 sm:px-6 sm:py-4 md:px-8 md:py-6 bg-slate-50 min-h-screen">
+    <div class="px-3 py-3 sm:px-4 sm:py-4 md:px-6 md:py-6 lg:px-8 lg:py-8 bg-slate-50 min-h-screen">
         
         <!-- Overview Tab (Matches the Reference Image exactly) -->
         <div x-show="activeTab === 'overview'" x-cloak class="space-y-6">

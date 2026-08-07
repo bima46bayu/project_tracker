@@ -55,7 +55,7 @@
                         <!-- Task Name & Progress -->
                         <div class="col-span-4 flex flex-col justify-center">
                             <span class="text-sm font-medium text-slate-800 group-hover/row:text-primary transition-colors" x-text="task.name"></span>
-                            <div class="flex items-center mt-1 w-48">
+                            <div class="flex items-center mt-1 w-full max-w-[8rem] sm:max-w-[12rem]">
                                 <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden flex-1 mr-2">
                                     <div class="h-full rounded-full" :class="task.progress_percentage == 100 ? 'bg-emerald-500' : 'bg-primary'" :style="`width: ${task.progress_percentage}%`"></div>
                                 </div>
