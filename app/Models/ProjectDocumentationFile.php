@@ -14,6 +14,7 @@ class ProjectDocumentationFile extends Model
         'file_path',
         'file_name',
         'file_type',
+        'file_size',
     ];
 
     public function documentation()

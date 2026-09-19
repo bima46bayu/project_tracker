@@ -246,7 +246,10 @@
                 tasks: @json($project->tasks),
                 payments: @json($project->payments),
                 indirect_costs: @json($project->indirectCosts),
-                issues: @json($project->issues)
+                actual_indirect_costs: @json($project->actualIndirectCosts),
+                is_indirect_cost_locked: {{ $project->is_indirect_cost_locked ? 'true' : 'false' }},
+                issues: @json($project->issues),
+                documentations: @json($project->documentations)
             },
             sCurveData: {},
             sCurveViewMode: 'daily',
@@ -254,6 +257,7 @@
             masterIndirectCosts: [],
             showTaskSlideover: false,
             showIssueModal: false,
+            showLockPlanModal: false,
             isEditingTask: false,
             isEditingIssue: false,
             activeTask: { name: '', start_date: '', end_date: '', status: 'TODO', priority: 'MEDIUM', progress_percentage: 0, task_items: [] },
@@ -391,6 +395,8 @@
                             tasks: data.tasks || [],
                             payments: data.payments || [],
                             indirect_costs: data.indirect_costs || [],
+                            actual_indirect_costs: data.actual_indirect_costs || [],
+                            is_indirect_cost_locked: data.is_indirect_cost_locked || false,
                             issues: data.issues || []
                         };
                     });
@@ -539,6 +545,10 @@
             },
 
             syncIndirectCosts() {
+                if (this.project.is_indirect_cost_locked) {
+                    this.$dispatch('notify', { msg: 'Plan is locked. Unlock it first to make changes.', type: 'error' });
+                    return;
+                }
                 const costsToSync = (this.project.indirect_costs || []).filter(c => c.master_indirect_cost_id);
                 fetch(`/api/projects/${this.projectId}/indirect-costs/sync`, {
                     method: 'POST',
@@ -548,11 +558,110 @@
                 .then(res => res.json())
                 .then(data => {
                     this.refreshProject();
-                    this.$dispatch('notify', { msg: 'Indirect costs saved successfully!', type: 'success' });
+                    this.$dispatch('notify', { msg: 'Plan indirect costs saved successfully!', type: 'success' });
                 })
                 .catch(err => {
-                    this.$dispatch('notify', { msg: 'Failed to save indirect costs.', type: 'error' });
+                    this.$dispatch('notify', { msg: 'Failed to save plan indirect costs.', type: 'error' });
                     console.error(err);
+                });
+            },
+
+            getIndirectCostItemLabel(indirectCostId) {
+                if (!indirectCostId) return '-';
+                const planItem = (this.project.indirect_costs || []).find(c => c.id == indirectCostId);
+                if (!planItem) return '-';
+                const master = this.masterIndirectCosts.find(m => m.id == planItem.master_indirect_cost_id);
+                return master ? master.name : `IC-${planItem.id}`;
+            },
+
+            getItemActualTotal(indirectCostId) {
+                if (!indirectCostId) return 0;
+                return (this.project.actual_indirect_costs || [])
+                    .filter(a => a.indirect_cost_id == indirectCostId)
+                    .reduce((sum, a) => sum + ((parseFloat(a.qty) || 0) * (parseFloat(a.harga_satuan) || 0)), 0);
+            },
+
+            getItemPlanTotal(cost) {
+                if (!cost) return 0;
+                return (parseFloat(cost.qty) || 0) * (parseFloat(cost.harga_satuan) || 0);
+            },
+
+            getItemSisaDana(cost) {
+                if (!cost) return 0;
+                const planTotal = this.getItemPlanTotal(cost);
+                const actualTotal = cost.id ? this.getItemActualTotal(cost.id) : 0;
+                return planTotal - actualTotal;
+            },
+
+            calculateIndirectCostPlanTotal() {
+                return (this.project.indirect_costs || []).reduce((sum, c) => sum + ((parseFloat(c.qty) || 0) * (parseFloat(c.harga_satuan) || 0)), 0);
+            },
+
+            calculateIndirectCostActualTotal() {
+                return (this.project.actual_indirect_costs || []).reduce((sum, a) => sum + ((parseFloat(a.qty) || 0) * (parseFloat(a.harga_satuan) || 0)), 0);
+            },
+
+            calculateIndirectCostSisaTotal() {
+                return this.calculateIndirectCostPlanTotal() - this.calculateIndirectCostActualTotal();
+            },
+
+            addActualIndirectCostRow() {
+                if (!this.project.actual_indirect_costs) this.project.actual_indirect_costs = [];
+                const today = new Date().toISOString().split('T')[0];
+                this.project.actual_indirect_costs.push({ indirect_cost_id: '', tanggal: today, sub_item: '', qty: 1, harga_satuan: 0, harga_total: 0 });
+            },
+
+            removeActualIndirectCostRow(index) {
+                if (confirm('Are you sure you want to remove this actual cost row?')) {
+                    this.project.actual_indirect_costs.splice(index, 1);
+                }
+            },
+
+            syncActualIndirectCosts() {
+                const actualsToSync = (this.project.actual_indirect_costs || []).map(a => ({
+                    indirect_cost_id: a.indirect_cost_id || null,
+                    tanggal: a.tanggal || null,
+                    sub_item: a.sub_item || '',
+                    qty: parseInt(a.qty) || 1,
+                    harga_satuan: parseFloat(a.harga_satuan) || 0,
+                    harga_total: (parseInt(a.qty) || 1) * (parseFloat(a.harga_satuan) || 0)
+                }));
+
+                fetch(`/api/projects/${this.projectId}/indirect-costs/actuals/sync`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    body: JSON.stringify({ actual_costs: actualsToSync })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    this.refreshProject();
+                    this.$dispatch('notify', { msg: 'Realisasi indirect costs saved successfully!', type: 'success' });
+                })
+                .catch(err => {
+                    this.$dispatch('notify', { msg: 'Failed to save realisasi indirect costs.', type: 'error' });
+                    console.error(err);
+                });
+            },
+
+            openLockPlanModal() {
+                this.showLockPlanModal = true;
+            },
+
+            toggleLockPlan() {
+                const newStatus = !this.project.is_indirect_cost_locked;
+                fetch(`/api/projects/${this.projectId}/indirect-costs/toggle-lock`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    body: JSON.stringify({ is_locked: newStatus })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    this.project.is_indirect_cost_locked = data.is_indirect_cost_locked;
+                    this.showLockPlanModal = false;
+                    this.$dispatch('notify', { 
+                        msg: data.is_indirect_cost_locked ? 'Indirect Cost Plan locked!' : 'Indirect Cost Plan unlocked!', 
+                        type: data.is_indirect_cost_locked ? 'info' : 'success' 
+                    });
                 });
             },
 

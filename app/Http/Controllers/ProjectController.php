@@ -67,6 +67,7 @@ class ProjectController extends Controller
             'tasks.taskItems.masterItem.category',
             'payments',
             'indirectCosts',
+            'actualIndirectCosts.indirectCost',
             'customer',
             'accountManager',
             'projectManagers',

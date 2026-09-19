@@ -38,6 +38,8 @@ Route::name('api.')->group(function () {
     // Project Indirect Costs
     Route::apiResource('indirect-costs', IndirectCostController::class);
     Route::post('projects/{project}/indirect-costs/sync', [IndirectCostController::class, 'sync']);
+    Route::post('projects/{project}/indirect-costs/actuals/sync', [IndirectCostController::class, 'syncActuals']);
+    Route::post('projects/{project}/indirect-costs/toggle-lock', [IndirectCostController::class, 'toggleLock']);
     Route::post('projects/{project}/tasks/sync', [ProjectTaskController::class, 'sync']);
 
     // Project Payments
@@ -48,7 +50,8 @@ Route::name('api.')->group(function () {
     Route::apiResource('issues', ProjectIssueController::class);
 
     // Project Documentation
-    Route::apiResource('documentations', ProjectDocumentationController::class)->only(['store', 'destroy']);
+    Route::apiResource('documentations', ProjectDocumentationController::class)->only(['store', 'update', 'destroy']);
+    Route::delete('documentation-files/{file}', [ProjectDocumentationController::class, 'deleteFile']);
 
     // New Master Data APIs
     Route::apiResource('users', UserController::class);

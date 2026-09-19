@@ -17,7 +17,8 @@ class Project extends Model
         'lokasi',
         'start_date',
         'end_date',
-        'status'
+        'status',
+        'is_indirect_cost_locked'
     ];
 
     protected static function boot()
@@ -71,6 +72,11 @@ class Project extends Model
     public function indirectCosts()
     {
         return $this->hasMany(IndirectCost::class);
+    }
+
+    public function actualIndirectCosts()
+    {
+        return $this->hasMany(ActualIndirectCost::class);
     }
 
     public function issues()

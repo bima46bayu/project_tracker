@@ -26,4 +26,9 @@ class IndirectCost extends Model
     {
         return $this->belongsTo(MasterIndirectCost::class);
     }
+
+    public function actualIndirectCosts()
+    {
+        return $this->hasMany(ActualIndirectCost::class, 'indirect_cost_id');
+    }
 }

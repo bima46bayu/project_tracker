@@ -11,7 +11,9 @@ class ProjectDocumentation extends Model
 
     protected $fillable = [
         'project_id',
+        'category',
         'title',
+        'document_number',
         'description',
         'logged_date',
     ];
