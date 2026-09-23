@@ -17,6 +17,11 @@ class ProjectTask extends Model
         'progress_percentage',
         'status',
         'priority',
+        'is_plan_locked',
+    ];
+
+    protected $casts = [
+        'is_plan_locked' => 'boolean',
     ];
 
     public function project()
@@ -27,6 +32,21 @@ class ProjectTask extends Model
     public function taskItems()
     {
         return $this->hasMany(TaskItem::class);
+    }
+
+    public function timelineWeeks()
+    {
+        return $this->hasMany(TaskTimelineWeek::class)->orderBy('week_number');
+    }
+
+    public function planWeeks()
+    {
+        return $this->hasMany(TaskTimelineWeek::class)->where('type', 'plan')->orderBy('week_number');
+    }
+
+    public function realisasiWeeks()
+    {
+        return $this->hasMany(TaskTimelineWeek::class)->where('type', 'realisasi')->orderBy('week_number');
     }
 
     public function issues()

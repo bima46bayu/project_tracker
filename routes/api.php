@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\BowheerController;
 use App\Http\Controllers\Api\MiscController;
 use App\Http\Controllers\ProjectIssueController;
 use App\Http\Controllers\ProjectDocumentationController;
+use App\Http\Controllers\TaskTimelineController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -27,6 +28,13 @@ Route::name('api.')->group(function () {
     // Project Tasks (BOQ)
     Route::apiResource('tasks', ProjectTaskController::class);
     Route::post('tasks/{task}/sync-items', [ProjectTaskController::class, 'syncTaskItems'])->name('tasks.sync-items');
+
+    // Task Timeline (Plan & Realisasi)
+    Route::post('tasks/{task}/timeline/plan', [TaskTimelineController::class, 'storePlan']);
+    Route::post('tasks/{task}/timeline/plan/lock', [TaskTimelineController::class, 'lockPlan']);
+    Route::post('tasks/{task}/timeline/plan/unlock', [TaskTimelineController::class, 'unlockPlan']);
+    Route::post('tasks/{task}/timeline/realisasi', [TaskTimelineController::class, 'storeRealisasi']);
+    Route::post('tasks/{task}/timeline/realisasi/add-week', [TaskTimelineController::class, 'addExtraWeek']);
 
     // Task Items (RAB Items)
     Route::apiResource('task-items', TaskItemController::class);

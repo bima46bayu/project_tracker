@@ -5,6 +5,7 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\MasterItemController;
 use App\Http\Controllers\MasterIndirectCostController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\TaskTimelineController;
 
 Route::get('/', function () {
     return redirect()->route('dashboard');
@@ -13,6 +14,7 @@ Route::get('/', function () {
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
 Route::resource('projects', ProjectController::class);
+Route::get('/projects/{project}/tasks/{task}', [TaskTimelineController::class, 'show'])->name('projects.tasks.show');
 
 Route::get('/master-data', function () {
     return view('master-data.new-index');

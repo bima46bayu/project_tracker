@@ -226,7 +226,7 @@
     document.addEventListener('alpine:init', () => {
         Alpine.data('projectTracker', (projectId) => ({
             projectId: projectId,
-            activeTab: 'overview',
+            activeTab: location.hash ? location.hash.substring(1) : 'overview',
             project: {
                 id: {{ $project->id }},
                 project_code: @json($project->project_code),
@@ -288,16 +288,6 @@
                     window.location.hash = value;
                 });
 
-                this.$watch('activeTask.progress_percentage', (value) => {
-                    const progress = parseInt(value) || 0;
-                    if (progress === 0) {
-                        this.activeTask.status = 'TODO';
-                    } else if (progress >= 100) {
-                        this.activeTask.status = 'DONE';
-                    } else {
-                        this.activeTask.status = 'IN_PROGRESS';
-                    }
-                });
                 this.fetchMasterItems();
                 this.fetchMasterIndirectCosts();
                 this.fetchSCurve();
@@ -404,100 +394,54 @@
 
             openNewTask() {
                 this.isEditingTask = false;
-                this.activeTask = { name: '', start_date: '', end_date: '', status: 'TODO', priority: 'MEDIUM', progress_percentage: 0, task_items: [] };
+                this.activeTask = { name: '', start_date: '', end_date: '', priority: 'MEDIUM', status: 'TODO', progress_percentage: 0 };
                 this.showTaskSlideover = true;
             },
 
             openTaskDetail(task) {
-                this.isEditingTask = true;
-                this.activeTask = JSON.parse(JSON.stringify(task));
-                if (!this.activeTask.task_items) this.activeTask.task_items = [];
-                this.showTaskSlideover = true;
+                window.location.href = `/projects/${this.projectId}/tasks/${task.id}`;
             },
 
             closeSlideover() {
                 this.showTaskSlideover = false;
             },
 
-            addActiveRabRow() {
-                this.activeTask.task_items.push({ master_item_id: '', qty: 1, harga_satuan: 0, modal_satuan: 0 });
-            },
-
-            updateActiveRabPrice(index) {
-                const rab = this.activeTask.task_items[index];
-                if (!rab.master_item_id) return;
-                
-                if(rab.harga_satuan === undefined) rab.harga_satuan = 0;
-                if(rab.modal_satuan === undefined) rab.modal_satuan = 0;
-            },
-
-            calculateActiveTaskTotal() {
-                if(!this.activeTask || !this.activeTask.task_items) return 0;
-                return this.activeTask.task_items.reduce((sum, item) => sum + (parseFloat(item.qty) * parseFloat(item.harga_satuan) || 0), 0);
-            },
-
-            calculateActiveTaskModal() {
-                if(!this.activeTask || !this.activeTask.task_items) return 0;
-                return this.activeTask.task_items.reduce((sum, item) => sum + (parseFloat(item.qty) * parseFloat(item.modal_satuan) || 0), 0);
-            },
-
-            calculateActiveTaskProfit() {
-                return this.calculateActiveTaskTotal() - this.calculateActiveTaskModal();
-            },
-
-            calculateActiveTaskProfitPercentage() {
-                const total = this.calculateActiveTaskTotal();
-                if(total === 0) return 0;
-                return ((this.calculateActiveTaskProfit() / total) * 100).toFixed(1);
-            },
-
             saveActiveTask() {
-                let p = parseInt(this.activeTask.progress_percentage) || 0;
-                if (p === 0) this.activeTask.status = 'TODO';
-                else if (p >= 100) this.activeTask.status = 'DONE';
-                else this.activeTask.status = 'IN_PROGRESS';
+                if (!this.activeTask.name) {
+                    this.$dispatch('notify', { msg: 'Nama task wajib diisi.', type: 'error' });
+                    return;
+                }
 
                 const taskData = {
                     project_id: this.projectId,
                     name: this.activeTask.name,
                     start_date: this.activeTask.start_date,
                     end_date: this.activeTask.end_date,
-                    status: this.activeTask.status,
-                    priority: this.activeTask.priority,
-                    progress_percentage: this.activeTask.progress_percentage
+                    status: 'TODO',
+                    priority: this.activeTask.priority || 'MEDIUM',
+                    progress_percentage: 0
                 };
 
-                const endpoint = this.isEditingTask ? `/api/tasks/${this.activeTask.id}` : '/api/tasks';
-                const method = this.isEditingTask ? 'PUT' : 'POST';
-
-                fetch(endpoint, {
-                    method: method,
+                fetch('/api/tasks', {
+                    method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                     body: JSON.stringify(taskData)
                 })
-                .then(res => res.json())
+                .then(res => {
+                    if (!res.ok) throw new Error('Failed to create task');
+                    return res.json();
+                })
                 .then(savedTask => {
-                    const taskId = savedTask.id || this.activeTask.id;
+                    this.closeSlideover();
+                    this.refreshProject();
+                    this.$dispatch('notify', { msg: 'Task berhasil dibuat!', type: 'success' });
                     
-                    fetch(`/api/tasks/${taskId}/sync-items`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                        body: JSON.stringify({
-                            task_items: this.activeTask.task_items.filter(rab => rab.master_item_id).map(rab => ({
-                                master_item_id: rab.master_item_id,
-                                qty: rab.qty,
-                                harga_satuan: rab.harga_satuan,
-                                modal_satuan: rab.modal_satuan || 0
-                            }))
-                        })
-                    }).then(() => {
-                        this.closeSlideover();
-                        this.refreshProject();
-                        
-                        setTimeout(() => {
-                            this.fetchSCurve();
-                        }, 500);
-                    });
+                    setTimeout(() => {
+                        this.fetchSCurve();
+                    }, 500);
+                })
+                .catch(err => {
+                    this.$dispatch('notify', { msg: 'Gagal membuat task.', type: 'error' });
                 });
             },
 
