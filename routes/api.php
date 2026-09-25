@@ -33,8 +33,10 @@ Route::name('api.')->group(function () {
     Route::post('tasks/{task}/timeline/plan', [TaskTimelineController::class, 'storePlan']);
     Route::post('tasks/{task}/timeline/plan/lock', [TaskTimelineController::class, 'lockPlan']);
     Route::post('tasks/{task}/timeline/plan/unlock', [TaskTimelineController::class, 'unlockPlan']);
+    Route::post('tasks/{task}/timeline/plan/add-week', [TaskTimelineController::class, 'addExtraPlanWeek']);
     Route::post('tasks/{task}/timeline/realisasi', [TaskTimelineController::class, 'storeRealisasi']);
     Route::post('tasks/{task}/timeline/realisasi/add-week', [TaskTimelineController::class, 'addExtraWeek']);
+    Route::delete('tasks/{task}/timeline/weeks/{week}', [TaskTimelineController::class, 'deleteWeek']);
 
     // Task Items (RAB Items)
     Route::apiResource('task-items', TaskItemController::class);

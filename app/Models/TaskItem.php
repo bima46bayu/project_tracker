@@ -17,6 +17,11 @@ class TaskItem extends Model
         'total_harga',
         'modal_satuan',
         'total_modal',
+        'qty_realisasi',
+        'harga_satuan_realisasi',
+        'modal_satuan_realisasi',
+        'total_harga_realisasi',
+        'total_modal_realisasi',
     ];
 
     public function projectTask()
@@ -27,5 +32,10 @@ class TaskItem extends Model
     public function masterItem()
     {
         return $this->belongsTo(MasterItem::class);
+    }
+
+    public function realisasis()
+    {
+        return $this->hasMany(TaskItemRealisasi::class);
     }
 }

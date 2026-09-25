@@ -62,18 +62,25 @@ class ProjectTaskController extends Controller
             'task_items.*.qty' => 'required|numeric|min:0',
             'task_items.*.harga_satuan' => 'required|numeric|min:0',
             'task_items.*.modal_satuan' => 'required|numeric|min:0',
+            'task_items.*.realisasis' => 'sometimes|array',
+            'task_items.*.realisasis.*.task_timeline_week_id' => 'required|exists:task_timeline_weeks,id',
+            'task_items.*.realisasis.*.qty_realisasi' => 'required|numeric|min:0',
+            'task_items.*.realisasis.*.harga_satuan_realisasi' => 'required|numeric|min:0',
         ]);
 
         $task->taskItems()->delete();
 
         if (!empty($validated['task_items'])) {
-            $items = array_map(function ($item) {
-                $item['total_harga'] = $item['qty'] * $item['harga_satuan'];
-                $item['total_modal'] = $item['qty'] * ($item['modal_satuan'] ?? 0);
-                return $item;
-            }, $validated['task_items']);
-
-            $task->taskItems()->createMany($items);
+            foreach ($validated['task_items'] as $itemData) {
+                $itemData['total_harga'] = $itemData['qty'] * $itemData['harga_satuan'];
+                $itemData['total_modal'] = $itemData['qty'] * ($itemData['modal_satuan'] ?? 0);
+                
+                $taskItem = $task->taskItems()->create($itemData);
+                
+                if (isset($itemData['realisasis']) && is_array($itemData['realisasis'])) {
+                    $taskItem->realisasis()->createMany($itemData['realisasis']);
+                }
+            }
         }
 
         return response()->json(['message' => 'Synced successfully']);
