@@ -9,7 +9,7 @@ class SCurveService
 {
     public function calculateSCurve(Project $project)
     {
-        $project->load('tasks.taskItems');
+        $project->load(['tasks.taskItems', 'tasks.planWeeks', 'tasks.realisasiWeeks']);
         
         $totalRAB = 0;
         foreach ($project->tasks as $task) {
@@ -28,78 +28,66 @@ class SCurveService
             ];
         }
 
-        $projectStart = Carbon::parse($project->start_date);
-        $projectEnd = Carbon::parse($project->end_date);
-
-        $minTaskStart = $project->tasks->min('start_date');
-        $maxTaskEnd = $project->tasks->max('end_date');
-
-        $effectiveStart = $minTaskStart ? Carbon::parse($minTaskStart) : $projectStart;
-        $effectiveEnd = $maxTaskEnd ? Carbon::parse($maxTaskEnd) : $projectEnd;
-
-        // Ensure start is not after end
-        if ($effectiveStart->gt($effectiveEnd)) {
-            $effectiveStart = $projectStart;
-            $effectiveEnd = $projectEnd;
-        }
-        
-        $durationDays = $effectiveStart->diffInDays($effectiveEnd) + 1;
-        
-        $plannedDailyWeight = array_fill(0, $durationDays, 0);
-        $actualTotal = 0;
-
+        // Collect all distinct weeks (Mondays) across the project tasks
+        $allMondays = collect();
         foreach ($project->tasks as $task) {
-            $taskWeight = ($task->calculated_total / $totalRAB) * 100;
-            $task->bobot = $taskWeight;
-
-            // Actual progress contribution
-            $actualTotal += ($task->progress_percentage / 100) * $taskWeight;
-
-            // Planned spread
-            $taskStart = Carbon::parse($task->start_date);
-            $taskEnd = Carbon::parse($task->end_date);
-            $taskDuration = $taskStart->diffInDays($taskEnd) + 1;
-
-            if ($taskDuration > 0) {
-                $dailyTaskWeight = $taskWeight / $taskDuration;
-                for ($d = 0; $d < $taskDuration; $d++) {
-                    $currentDate = $taskStart->copy()->addDays($d);
-                    if ($currentDate->between($effectiveStart, $effectiveEnd)) {
-                        $dayIndex = $effectiveStart->diffInDays($currentDate);
-                        $plannedDailyWeight[$dayIndex] += $dailyTaskWeight;
-                    }
+            $task->bobot = ($task->calculated_total / $totalRAB) * 100;
+            
+            foreach ($task->planWeeks as $pw) {
+                $allMondays->push($pw->start_date);
+            }
+            foreach ($task->realisasiWeeks as $rw) {
+                if ($rw->progress_percentage > 0) {
+                    $allMondays->push($rw->start_date);
                 }
             }
         }
-
-        // Cumulative Arrays
+        
+        $allMondays = $allMondays->unique()->sort()->values();
+        
         $plannedCurve = [];
-        $cumulativePlanned = 0;
-        for ($i = 0; $i < $durationDays; $i++) {
-            $cumulativePlanned += $plannedDailyWeight[$i];
-            $plannedCurve[] = [
-                'day' => $i + 1,
-                'date' => $effectiveStart->copy()->addDays($i)->format('Y-m-d'),
-                'planned_cumulative' => round($cumulativePlanned, 2)
-            ];
-        }
-
-        $histories = \App\Models\ProjectProgressHistory::where('project_id', $project->id)
-            ->orderBy('record_date', 'asc')
-            ->get();
-            
         $actualCurve = [];
-        // Map history to our format
-        foreach ($histories as $history) {
-            $actualCurve[] = [
-                'date' => $history->record_date,
-                'actual_cumulative' => (float) $history->progress_percentage
+        $currentActualProgress = 0;
+
+        foreach ($allMondays as $index => $monday) {
+            $cumulativePlan = 0;
+            $cumulativeActual = 0;
+            $weekDate = Carbon::parse($monday);
+            
+            foreach ($project->tasks as $task) {
+                // Find the latest plan week up to this monday
+                $latestPlan = $task->planWeeks->where('start_date', '<=', $monday)->sortByDesc('start_date')->first();
+                $planProgress = $latestPlan ? $latestPlan->progress_percentage : 0;
+                $cumulativePlan += ($planProgress / 100) * $task->bobot;
+                
+                // Find the latest realisasi week up to this monday
+                $latestRealisasi = $task->realisasiWeeks->where('start_date', '<=', $monday)->sortByDesc('start_date')->first();
+                $realisasiProgress = $latestRealisasi ? $latestRealisasi->progress_percentage : 0;
+                $cumulativeActual += ($realisasiProgress / 100) * $task->bobot;
+            }
+
+            $plannedCurve[] = [
+                'day' => $index + 1,
+                'week' => 'W' . ($index + 1),
+                'date' => $monday,
+                'planned_cumulative' => round($cumulativePlan, 2)
             ];
+
+            // Only add to actual curve if date is not in future, or if it has progress
+            // To prevent actual curve from drawing flat lines into the future
+            if ($weekDate->lte(Carbon::today()) || $cumulativeActual > 0) {
+                $actualCurve[] = [
+                    'week' => 'W' . ($index + 1),
+                    'date' => $monday,
+                    'actual_cumulative' => round($cumulativeActual, 2)
+                ];
+                $currentActualProgress = round($cumulativeActual, 2);
+            }
         }
 
         return [
             'total_rab' => $totalRAB,
-            'current_actual_progress' => round($actualTotal, 2),
+            'current_actual_progress' => $currentActualProgress,
             'planned_curve' => $plannedCurve,
             'actual_curve' => $actualCurve,
             'tasks_summary' => $project->tasks->map(function($t) {

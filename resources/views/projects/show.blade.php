@@ -804,41 +804,29 @@
                     }
                 }
 
-                let labels = [];
-                let plannedData = [];
-                let actualData = [];
+                let labels = this.sCurveData.planned_curve.map(c => c.week + ' (' + this.formatDate(c.date) + ')');
+                let plannedData = rawPlannedData;
+                
+                let filledActual = [];
+                let lastKnown = null;
+                const todayStr = new Date().toISOString().split('T')[0];
+                let pastToday = false;
 
-                if (this.sCurveViewMode === 'weekly') {
-                    let filledActual = [];
-                    let lastKnown = null;
-                    const todayStr = new Date().toISOString().split('T')[0];
-                    let pastToday = false;
-
-                    for (let i = 0; i < rawLabels.length; i++) {
-                        if (rawLabels[i] > todayStr) pastToday = true;
-                        
-                        if (rawActualData[i] !== null) {
-                            lastKnown = rawActualData[i];
-                        }
-                        
-                        if (pastToday && rawActualData[i] === null) {
-                            filledActual.push(null);
-                        } else {
-                            filledActual.push(lastKnown);
-                        }
+                for (let i = 0; i < rawLabels.length; i++) {
+                    if (rawLabels[i] > todayStr) pastToday = true;
+                    
+                    if (rawActualData[i] !== null) {
+                        lastKnown = rawActualData[i];
                     }
-
-                    for (let i = 0; i < rawLabels.length; i += 7) {
-                        let weekEndIndex = Math.min(i + 6, rawLabels.length - 1);
-                        labels.push(`Week ${Math.floor(i/7) + 1} (${rawLabels[weekEndIndex]})`);
-                        plannedData.push(rawPlannedData[weekEndIndex]);
-                        actualData.push(filledActual[weekEndIndex]);
+                    
+                    if (pastToday && rawActualData[i] === null) {
+                        filledActual.push(null);
+                    } else {
+                        filledActual.push(lastKnown);
                     }
-                } else {
-                    labels = rawLabels;
-                    plannedData = rawPlannedData;
-                    actualData = rawActualData;
                 }
+                
+                let actualData = filledActual;
 
                 new Chart(ctx, {
                     type: 'line',
