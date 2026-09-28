@@ -57,7 +57,7 @@
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                 Bobot Project
             </button>
-            <a href="#" @click.prevent="activeTab = 's-curve'" class="whitespace-nowrap pb-3 border-b-2 font-medium text-xs sm:text-sm transition-colors flex items-center" :class="activeTab === 's-curve' ? 'border-primary text-primary' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'">
+            <a href="#" @click.prevent="activeTab = 's-curve'; setTimeout(() => { renderChart(); }, 100);" class="whitespace-nowrap pb-3 border-b-2 font-medium text-xs sm:text-sm transition-colors flex items-center" :class="activeTab === 's-curve' ? 'border-primary text-primary' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'">
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path></svg>
                 S-Curve
             </a>
@@ -273,6 +273,12 @@
                 return 'NOT_STARTED';
             },
 
+            formatDate(dateString) {
+                if (!dateString) return '-';
+                const date = new Date(dateString);
+                return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+            },
+
             init() {
                 // Initialize tab from URL hash
                 if (window.location.hash) {
@@ -286,6 +292,9 @@
                 // Sync URL hash when tab changes
                 this.$watch('activeTab', (value) => {
                     window.location.hash = value;
+                    if (value === 's-curve') {
+                        setTimeout(() => { this.renderChart(); }, 100);
+                    }
                 });
 
                 this.fetchMasterItems();
