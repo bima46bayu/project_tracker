@@ -16,9 +16,45 @@ Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard
 Route::resource('projects', ProjectController::class);
 Route::get('/projects/{project}/tasks/{task}', [TaskTimelineController::class, 'show'])->name('projects.tasks.show');
 
+// Fallback redirect for old master-data root URL
 Route::get('/master-data', function () {
-    return view('master-data.new-index');
+    return redirect()->route('master-data.managers.index');
 })->name('master-data.index');
+
+Route::get('/master-data/managers', function () {
+    return view('master-data.new-index', [
+        'type' => 'managers',
+        'initialData' => \App\Models\User::all()
+    ]);
+})->name('master-data.managers.index');
+
+Route::get('/master-data/customers', function () {
+    return view('master-data.new-index', [
+        'type' => 'customers',
+        'initialData' => \App\Models\Customer::all()
+    ]);
+})->name('master-data.customers.index');
+
+Route::get('/master-data/subkons', function () {
+    return view('master-data.new-index', [
+        'type' => 'subkons',
+        'initialData' => \App\Models\Subkon::all()
+    ]);
+})->name('master-data.subkons.index');
+
+Route::get('/master-data/bowheers', function () {
+    return view('master-data.new-index', [
+        'type' => 'bowheers',
+        'initialData' => \App\Models\Bowheer::all()
+    ]);
+})->name('master-data.bowheers.index');
+
+Route::get('/master-data/misc', function () {
+    return view('master-data.new-index', [
+        'type' => 'misc',
+        'initialData' => \App\Models\Misc::all()
+    ]);
+})->name('master-data.misc.index');
 
 Route::get('/master-items', function () {
     return view('master-data.index', [

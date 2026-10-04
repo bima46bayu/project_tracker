@@ -2,6 +2,7 @@
 @section('title', 'Register New Project')
 
 @section('content')
+<meta name="turbo-cache-control" content="no-cache">
 
 
 
@@ -72,7 +73,7 @@
                     <div wire:ignore>
                         <select name="bowheer_id" id="bowheer_id" required placeholder="-- Select Bowheer --"></select>
                     </div>
-                    <p class="text-[10px] text-amber-600 mt-1 hidden" id="bowheer_warning">No bowheers in master data. <a href="{{ route('master-data.index') }}" class="underline">Add in Master Data</a></p>
+                    <p class="text-[10px] text-amber-600 mt-1 hidden" id="bowheer_warning">No bowheers in master data. <a href="{{ route('master-data.bowheers.index') }}" class="underline">Add in Master Data</a></p>
                 </div>
 
                 <!-- RIGHT COLUMN -->

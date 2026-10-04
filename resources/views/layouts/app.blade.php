@@ -10,23 +10,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Poppins', 'sans-serif'],
-                    },
-                    colors: {
-                        primary: '#2563eb', // Blue 600
-                        'primary-light': '#eff6ff', // Blue 50
-                    }
-                }
-            }
-        }
-    </script>
+    <!-- Tailwind CSS (via Vite) -->
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     
     <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
@@ -145,7 +130,7 @@
                     <div x-data="{ show: false }" 
                          x-init="$nextTick(() => show = true)"
                          x-show="show" 
-                         x-transition.opacity.duration.300ms
+                         x-transition.opacity.duration.75ms
                          :class="toast.type === 'error' ? 'bg-red-50 border-red-200 text-red-700' : 'bg-emerald-50 border-emerald-200 text-emerald-700'"
                          class="border px-4 py-3 rounded-lg text-sm shadow-lg pointer-events-auto flex items-center space-x-3 transition-all">
                         
@@ -169,7 +154,7 @@
                     <div x-data="{ show: true }" 
                          x-show="show" 
                          x-init="setTimeout(() => show = false, 3000)"
-                         x-transition.opacity.duration.300ms
+                         x-transition.opacity.duration.75ms
                          class="bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-lg text-sm shadow-lg pointer-events-auto flex items-center space-x-3">
                         <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         <span class="font-medium">{{ session('success') }}</span>
@@ -181,7 +166,7 @@
                     <div x-data="{ show: true }" 
                          x-show="show" 
                          x-init="setTimeout(() => show = false, 5000)"
-                         x-transition.opacity.duration.300ms
+                         x-transition.opacity.duration.75ms
                          class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm shadow-lg pointer-events-auto flex items-start space-x-3 max-w-sm">
                         <svg class="w-5 h-5 text-red-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         <div>
@@ -208,7 +193,7 @@
             </div>
 
             <!-- Actual Content -->
-            <div x-show="!loading" x-transition.opacity.duration.300ms>
+            <div x-show="!loading" x-transition.opacity.duration.75ms>
                 @yield('content')
             </div>
         </div>

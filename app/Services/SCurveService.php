@@ -55,14 +55,13 @@ class SCurveService
             $weekDate = Carbon::parse($monday);
             
             foreach ($project->tasks as $task) {
-                // Find the latest plan week up to this monday
-                $latestPlan = $task->planWeeks->where('start_date', '<=', $monday)->sortByDesc('start_date')->first();
-                $planProgress = $latestPlan ? $latestPlan->progress_percentage : 0;
+                // Since progress_percentage is cumulative, we take the max progress up to this monday
+                // This prevents trailing 0s from dropping the curve back down
+                $planProgress = $task->planWeeks->where('start_date', '<=', $monday)->max('progress_percentage') ?? 0;
                 $cumulativePlan += ($planProgress / 100) * $task->bobot;
                 
-                // Find the latest realisasi week up to this monday
-                $latestRealisasi = $task->realisasiWeeks->where('start_date', '<=', $monday)->sortByDesc('start_date')->first();
-                $realisasiProgress = $latestRealisasi ? $latestRealisasi->progress_percentage : 0;
+                // Same for realisasi
+                $realisasiProgress = $task->realisasiWeeks->where('start_date', '<=', $monday)->max('progress_percentage') ?? 0;
                 $cumulativeActual += ($realisasiProgress / 100) * $task->bobot;
             }
 

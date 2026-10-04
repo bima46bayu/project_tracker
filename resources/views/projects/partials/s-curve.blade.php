@@ -19,18 +19,6 @@
             <h3 class="text-sm font-bold text-slate-800 mb-1">S-Curve Plan vs Actual</h3>
             <p class="text-xs text-slate-500">Grafik otomatis dihasilkan berdasarkan bobot RAB dan durasi.</p>
         </div>
-        <div class="flex items-center space-x-2 bg-slate-100 p-1 rounded-lg">
-            <button @click="sCurveViewMode = 'daily'; renderChart()" 
-                :class="sCurveViewMode === 'daily' ? 'bg-white shadow-sm text-slate-800 font-medium' : 'text-slate-500 hover:text-slate-700'"
-                class="px-3 py-1.5 text-xs rounded-md transition-all">
-                Harian
-            </button>
-            <button @click="sCurveViewMode = 'weekly'; renderChart()" 
-                :class="sCurveViewMode === 'weekly' ? 'bg-white shadow-sm text-slate-800 font-medium' : 'text-slate-500 hover:text-slate-700'"
-                class="px-3 py-1.5 text-xs rounded-md transition-all">
-                Mingguan
-            </button>
-        </div>
     </div>
     <div class="w-full overflow-x-auto relative">
         <div x-show="!sCurveData.planned_curve || sCurveData.planned_curve.length === 0" x-cloak>
@@ -41,7 +29,7 @@
             </div>
         </div>
         <div x-show="sCurveData.planned_curve && sCurveData.planned_curve.length > 0" x-cloak>
-            <div class="h-[350px]" :style="{ width: sCurveViewMode === 'daily' && sCurveData.planned_curve ? (sCurveData.planned_curve.length * 60) + 'px' : '100%' }">
+            <div class="h-[350px]" style="width: 100%;">
                 <canvas id="scurveChart"></canvas>
             </div>
         </div>

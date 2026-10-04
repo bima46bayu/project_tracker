@@ -2,6 +2,7 @@
 @section('title', $project->name)
 
 @section('content')
+<meta name="turbo-cache-control" content="no-cache">
 <div x-data="projectTracker({{ $project->id }})" class="min-h-screen bg-white">
     
     <!-- Header Summary (Matching Reference) -->

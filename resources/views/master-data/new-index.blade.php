@@ -4,181 +4,129 @@
 @section('content')
 <meta name="turbo-cache-control" content="no-cache">
 <script>
-    const initMasterDataApp = () => {
+    document.addEventListener('alpine:init', () => {
         Alpine.data('masterDataApp', () => ({
-            activeTab: 'managers',
+            activeTab: '{{ $type ?? 'managers' }}',
             isModalOpen: false,
             modalType: '',
             formData: {},
             errorMsg: '',
+            searchQuery: '',
+            isLoading: false,
             
-            managers: [],
-            customers: [],
-            subkons: [],
-            bowheers: [],
-            miscs: [],
+            managers: @json(isset($type) && $type === 'managers' ? $initialData : null),
+            customers: @json(isset($type) && $type === 'customers' ? $initialData : null),
+            subkons: @json(isset($type) && $type === 'subkons' ? $initialData : null),
+            bowheers: @json(isset($type) && $type === 'bowheers' ? $initialData : null),
+            miscs: @json(isset($type) && $type === 'misc' ? $initialData : null),
             
             initMiscTypeSelect(el) {
-                  // Ensure previous instance is destroyed if re-mounted
-                  if (el.tomselect) el.tomselect.destroy();
-                  
-                  let ts = new TomSelect(el, {
-                      valueField: 'type',
-                      labelField: 'type',
-                      searchField: 'type',
-                      create: true,
-                      onChange: (value) => {
-                          this.formData.type = value;
-                      }
-                  });
-                  
-                  fetch('/api/miscs')
-                      .then(res => res.json())
-                      .then(data => {
-                          // Extract unique types and ensure jenis_project is always available
-                        const uniqueTypes = new Set(data.map(item => item.type));
-                        uniqueTypes.add('jenis_project');
-                        
-                        ts.addOptions(Array.from(uniqueTypes).map(t => ({type: t})));
-                        
-                        // Set value if editing
-                        if (this.formData.type) {
-                              ts.setValue(this.formData.type);
-                          }
-                      });
-              },
+                if (el.tomselect) el.tomselect.destroy();
+                let ts = new TomSelect(el, {
+                    valueField: 'type', labelField: 'type', searchField: 'type', create: true,
+                    onChange: (value) => { this.formData.type = value; }
+                });
+                fetch('/api/miscs').then(res => res.json()).then(data => {
+                    const uniqueTypes = new Set(data.map(item => item.type));
+                    uniqueTypes.add('jenis_project');
+                    ts.addOptions(Array.from(uniqueTypes).map(t => ({type: t})));
+                    if (this.formData.type) ts.setValue(this.formData.type);
+                });
+            },
 
             init() {
-                this.fetchData('users', 'managers');
-                this.fetchData('customers');
-                this.fetchData('subkons');
-                this.fetchData('bowheers');
-                this.fetchData('miscs');
+                this.loadTabData(this.activeTab);
+                this.$watch('activeTab', (value) => {
+                    this.searchQuery = '';
+                    this.loadTabData(value);
+                });
+            },
+
+            loadTabData(tab) {
+                let endpoint = tab === 'managers' ? 'users' : tab;
+                let prop = tab === 'misc' ? 'miscs' : tab;
+                if (tab === 'misc') endpoint = 'miscs';
+                if (this[prop] === null) this.fetchData(endpoint, prop);
             },
 
             fetchData(endpoint, property = null) {
                 let prop = property || endpoint;
+                this.isLoading = true;
                 fetch(`/api/${endpoint}`)
                     .then(res => res.json())
-                    .then(data => {
-                        this[prop] = data;
-                    });
+                    .then(data => { this[prop] = data; this.isLoading = false; })
+                    .catch(() => { this.isLoading = false; });
             },
 
-            openModal(type) {
-                this.modalType = type;
-                this.formData = {};
-                this.isModalOpen = true;
+            get filteredData() {
+                let prop = this.activeTab === 'misc' ? 'miscs' : this.activeTab;
+                let data = this[prop] || [];
+                if (!this.searchQuery) return data;
+                let q = this.searchQuery.toLowerCase();
+                return data.filter(item => Object.values(item).some(val => val && String(val).toLowerCase().includes(q)));
             },
 
-            editItem(type, item) {
-                this.modalType = type;
-                this.formData = { ...item };
-                this.isModalOpen = true;
-            },
+            openModal(type) { this.modalType = type; this.formData = {}; this.errorMsg = ''; this.isModalOpen = true; },
+            editItem(type, item) { this.modalType = type; this.formData = { ...item }; this.errorMsg = ''; this.isModalOpen = true; },
 
             submitForm() {
                 let endpoint = this.modalType;
                 let prop = this.modalType;
-                
-                if (this.modalType === 'managers') {
-                    endpoint = 'users';
-                    prop = 'managers';
-                } else if (this.modalType === 'misc') {
-                    endpoint = 'miscs';
-                    prop = 'miscs';
-                }
+                if (this.modalType === 'managers') { endpoint = 'users'; prop = 'managers'; }
+                else if (this.modalType === 'misc') { endpoint = 'miscs'; prop = 'miscs'; }
                 
                 let method = this.formData.id ? 'PUT' : 'POST';
                 let url = this.formData.id ? `/api/${endpoint}/${this.formData.id}` : `/api/${endpoint}`;
                 
                 fetch(url, {
-                    method: method,
-                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    method, headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                     body: JSON.stringify(this.formData)
-                }).then(res => {
-                    return res.json().then(data => ({ status: res.status, ok: res.ok, body: data }));
-                }).then(result => {
+                }).then(res => res.json().then(data => ({ status: res.status, ok: res.ok, body: data })))
+                .then(result => {
                     if (result.ok) {
                         this.isModalOpen = false;
+                        this[prop] = null;
                         this.fetchData(endpoint, prop);
                     } else {
-                        if (result.status === 422 && result.body.errors) {
-                            let msgs = Object.values(result.body.errors).flat();
-                            this.errorMsg = msgs.join(', ');
-                        } else {
-                            this.errorMsg = result.body.message || 'Error saving data';
-                        }
+                        this.errorMsg = result.status === 422 && result.body.errors
+                            ? Object.values(result.body.errors).flat().join(', ')
+                            : (result.body.message || 'Error saving data');
                     }
-                }).catch(e => {
-                    this.errorMsg = 'Network error occurred.';
+                }).catch(() => { this.errorMsg = 'Network error occurred.'; });
+            },
+
+            deleteItem(endpoint, id) {
+                if (!confirm('Are you sure?')) return;
+                fetch(`/api/${endpoint}/${id}`, { method: 'DELETE' }).then(() => {
+                    let prop = endpoint === 'users' ? 'managers' : endpoint;
+                    this[prop] = null;
+                    this.fetchData(endpoint, prop);
                 });
             },
 
-
-            deleteItem(endpoint, id) {
-                if(!confirm('Are you sure?')) return;
-                fetch(`/api/${endpoint}/${id}`, { method: 'DELETE' })
-                    .then(() => {
-                        let prop = endpoint === 'users' ? 'managers' : endpoint;
-                        this.fetchData(endpoint, prop);
-                    });
-            },
-
             resetPassword(id) {
-                let newPassword = prompt("Enter new password for this user (minimum 6 characters):");
-                if (newPassword && newPassword.length >= 6) {
+                let pw = prompt("Enter new password (min 6 chars):");
+                if (pw && pw.length >= 6) {
                     fetch(`/api/users/${id}`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                        body: JSON.stringify({ password: newPassword })
+                        body: JSON.stringify({ password: pw })
                     }).then(res => {
-                        if (res.ok) window.dispatchEvent(new CustomEvent('notify', { detail: { msg: 'Password reset successfully!', type: 'success' } }));
-                        else window.dispatchEvent(new CustomEvent('notify', { detail: { msg: 'Failed to reset password.', type: 'error' } }));
+                        let msg = res.ok ? 'Password reset!' : 'Failed to reset.';
+                        let type = res.ok ? 'success' : 'error';
+                        window.dispatchEvent(new CustomEvent('notify', { detail: { msg, type } }));
                     });
-                } else if (newPassword) {
+                } else if (pw) {
                     window.dispatchEvent(new CustomEvent('notify', { detail: { msg: 'Password too short!', type: 'error' } }));
                 }
             }
         }));
-    };
-    
-    if (typeof Alpine !== 'undefined') {
-        initMasterDataApp();
-    } else {
-        document.addEventListener('alpine:init', initMasterDataApp);
-    }
+    });
 </script>
 <div x-data="masterDataApp()" class="px-4 py-4 md:px-8 md:py-6 min-h-screen bg-white">
-    <div class="mb-2">
-        <h2 class="text-xl font-bold text-slate-900">Master Data</h2>
-        <p class="text-sm text-slate-500">Manage Account Managers, Project Managers, Customers, and Subkons</p>
-    </div>
-
-    <!-- Tabs -->
-    <div class="mb-6 border-b border-slate-200 mt-6 overflow-x-auto scrollbar-none">
-        <nav class="-mb-px flex space-x-8 text-sm min-w-max">
-            <button @click="activeTab = 'managers'" :class="activeTab === 'managers' ? 'border-primary text-primary font-medium' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'" class="whitespace-nowrap pb-3 px-1 border-b-2 transition-colors flex items-center">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                Account & Project Managers
-            </button>
-            <button @click="activeTab = 'customers'" :class="activeTab === 'customers' ? 'border-primary text-primary font-medium' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'" class="whitespace-nowrap pb-3 px-1 border-b-2 transition-colors flex items-center">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
-                Customers
-            </button>
-            <button @click="activeTab = 'subkons'" :class="activeTab === 'subkons' ? 'border-primary text-primary font-medium' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'" class="whitespace-nowrap pb-3 px-1 border-b-2 transition-colors flex items-center">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                Subkons
-            </button>
-            <button @click="activeTab = 'bowheers'" :class="activeTab === 'bowheers' ? 'border-primary text-primary font-medium' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'" class="whitespace-nowrap pb-3 px-1 border-b-2 transition-colors flex items-center">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                Bowheers
-            </button>
-            <button @click="activeTab = 'misc'" :class="activeTab === 'misc' ? 'border-primary text-primary font-medium' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'" class="whitespace-nowrap pb-3 px-1 border-b-2 transition-colors flex items-center">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                Misc
-            </button>
-        </nav>
+    <div class="mb-6">
+        <h2 class="text-xl font-bold text-slate-900 capitalize">Master {{ $type ?? 'Managers' }}</h2>
+        <p class="text-sm text-slate-500">Manage {{ $type ?? 'Managers' }} data</p>
     </div>
 
     <!-- Tab Contents -->
@@ -186,8 +134,12 @@
         
         <!-- Managers Tab -->
         <div x-show="activeTab === 'managers'" x-cloak class="p-6">
-            <div class="flex justify-end mb-4">
-                <button @click="openModal('managers')" class="bg-primary hover:bg-blue-700 text-white px-4 py-2 rounded text-xs font-medium transition-colors">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
+                <div class="relative w-full sm:w-64">
+                    <input type="text" x-model="searchQuery" placeholder="Search managers..." class="w-full text-xs border border-slate-300 rounded-lg pl-8 pr-3 py-2 focus:border-primary focus:ring-1 focus:ring-primary/30 outline-none transition-colors">
+                    <svg class="w-4 h-4 text-slate-400 absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </div>
+                <button @click="openModal('managers')" class="bg-primary hover:bg-blue-700 text-white px-4 py-2 rounded text-xs font-medium transition-colors whitespace-nowrap">
                     + Add Manager
                 </button>
             </div>
@@ -202,8 +154,14 @@
                             <th class="px-4 py-3 text-right text-[10px] font-bold text-primary uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-100 text-sm">
-                        <template x-for="item in managers" :key="item.id">
+                    <tbody class="divide-y divide-slate-100 text-xs">
+                        <template x-if="isLoading">
+                            <tr><td colspan="5" class="px-4 py-8 text-center text-slate-400 text-xs">Loading data...</td></tr>
+                        </template>
+                        <template x-if="!isLoading && filteredData.length === 0">
+                            <tr><td colspan="5" class="px-4 py-8 text-center text-slate-400 text-xs">No data found.</td></tr>
+                        </template>
+                        <template x-for="item in filteredData" :key="item.id">
                             <tr class="hover:bg-slate-50">
                                 <td class="px-4 py-3 text-slate-800 font-medium" x-text="item.name"></td>
                                 <td class="px-4 py-3">
@@ -231,8 +189,12 @@
 
         <!-- Customers Tab -->
         <div x-show="activeTab === 'customers'" x-cloak class="p-6">
-            <div class="flex justify-end mb-4">
-                <button @click="openModal('customers')" class="bg-primary hover:bg-blue-700 text-white px-4 py-2 rounded text-xs font-medium transition-colors">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
+                <div class="relative w-full sm:w-64">
+                    <input type="text" x-model="searchQuery" placeholder="Search customers..." class="w-full text-xs border border-slate-300 rounded-lg pl-8 pr-3 py-2 focus:border-primary focus:ring-1 focus:ring-primary/30 outline-none transition-colors">
+                    <svg class="w-4 h-4 text-slate-400 absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </div>
+                <button @click="openModal('customers')" class="bg-primary hover:bg-blue-700 text-white px-4 py-2 rounded text-xs font-medium transition-colors whitespace-nowrap">
                     + Add Customer
                 </button>
             </div>
@@ -249,8 +211,14 @@
                             <th class="px-4 py-3 text-right text-[10px] font-bold text-primary uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-100 text-sm">
-                        <template x-for="item in customers" :key="item.id">
+                    <tbody class="divide-y divide-slate-100 text-xs">
+                        <template x-if="isLoading">
+                            <tr><td colspan="7" class="px-4 py-8 text-center text-slate-400 text-xs">Loading data...</td></tr>
+                        </template>
+                        <template x-if="!isLoading && filteredData.length === 0">
+                            <tr><td colspan="7" class="px-4 py-8 text-center text-slate-400 text-xs">No data found.</td></tr>
+                        </template>
+                        <template x-for="item in filteredData" :key="item.id">
                             <tr class="hover:bg-slate-50">
                                 <td class="px-4 py-3 text-slate-500 text-xs font-medium" x-text="item.customer_code"></td>
                                 <td class="px-4 py-3 text-slate-800 font-medium" x-text="item.name"></td>
@@ -275,8 +243,12 @@
 
         <!-- Subkons Tab -->
         <div x-show="activeTab === 'subkons'" x-cloak class="p-6">
-            <div class="flex justify-end mb-4">
-                <button @click="openModal('subkons')" class="bg-primary hover:bg-blue-700 text-white px-4 py-2 rounded text-xs font-medium transition-colors">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
+                <div class="relative w-full sm:w-64">
+                    <input type="text" x-model="searchQuery" placeholder="Search subkons..." class="w-full text-xs border border-slate-300 rounded-lg pl-8 pr-3 py-2 focus:border-primary focus:ring-1 focus:ring-primary/30 outline-none transition-colors">
+                    <svg class="w-4 h-4 text-slate-400 absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </div>
+                <button @click="openModal('subkons')" class="bg-primary hover:bg-blue-700 text-white px-4 py-2 rounded text-xs font-medium transition-colors whitespace-nowrap">
                     + Add Subkon
                 </button>
             </div>
@@ -293,8 +265,14 @@
                             <th class="px-4 py-3 text-right text-[10px] font-bold text-primary uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-100 text-sm">
-                        <template x-for="item in subkons" :key="item.id">
+                    <tbody class="divide-y divide-slate-100 text-xs">
+                        <template x-if="isLoading">
+                            <tr><td colspan="7" class="px-4 py-8 text-center text-slate-400 text-xs">Loading data...</td></tr>
+                        </template>
+                        <template x-if="!isLoading && filteredData.length === 0">
+                            <tr><td colspan="7" class="px-4 py-8 text-center text-slate-400 text-xs">No data found.</td></tr>
+                        </template>
+                        <template x-for="item in filteredData" :key="item.id">
                             <tr class="hover:bg-slate-50">
                                 <td class="px-4 py-3 text-slate-500 text-xs font-medium" x-text="item.subkon_code"></td>
                                 <td class="px-4 py-3 text-slate-800 font-medium" x-text="item.name"></td>
@@ -319,8 +297,12 @@
 
         <!-- Bowheers Tab -->
         <div x-show="activeTab === 'bowheers'" x-cloak class="p-6">
-            <div class="flex justify-end mb-4">
-                <button @click="openModal('bowheers')" class="bg-primary hover:bg-blue-700 text-white px-4 py-2 rounded text-xs font-medium transition-colors">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
+                <div class="relative w-full sm:w-64">
+                    <input type="text" x-model="searchQuery" placeholder="Search bowheers..." class="w-full text-xs border border-slate-300 rounded-lg pl-8 pr-3 py-2 focus:border-primary focus:ring-1 focus:ring-primary/30 outline-none transition-colors">
+                    <svg class="w-4 h-4 text-slate-400 absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </div>
+                <button @click="openModal('bowheers')" class="bg-primary hover:bg-blue-700 text-white px-4 py-2 rounded text-xs font-medium transition-colors whitespace-nowrap">
                     + Add Bowheer
                 </button>
             </div>
@@ -337,8 +319,14 @@
                             <th class="px-4 py-3 text-right text-[10px] font-bold text-primary uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-100 text-sm">
-                        <template x-for="item in bowheers" :key="item.id">
+                    <tbody class="divide-y divide-slate-100 text-xs">
+                        <template x-if="isLoading">
+                            <tr><td colspan="7" class="px-4 py-8 text-center text-slate-400 text-xs">Loading data...</td></tr>
+                        </template>
+                        <template x-if="!isLoading && filteredData.length === 0">
+                            <tr><td colspan="7" class="px-4 py-8 text-center text-slate-400 text-xs">No data found.</td></tr>
+                        </template>
+                        <template x-for="item in filteredData" :key="item.id">
                             <tr class="hover:bg-slate-50">
                                 <td class="px-4 py-3 text-slate-500 text-xs font-medium" x-text="item.bowheer_code"></td>
                                 <td class="px-4 py-3 text-slate-800 font-medium" x-text="item.name"></td>
@@ -363,8 +351,12 @@
 
         <!-- Misc Tab (e.g., Jenis Project) -->
         <div x-show="activeTab === 'misc'" x-cloak class="p-6">
-            <div class="flex justify-end mb-4">
-                <button @click="openModal('misc')" class="bg-primary hover:bg-blue-700 text-white px-4 py-2 rounded text-xs font-medium transition-colors">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
+                <div class="relative w-full sm:w-64">
+                    <input type="text" x-model="searchQuery" placeholder="Search misc..." class="w-full text-xs border border-slate-300 rounded-lg pl-8 pr-3 py-2 focus:border-primary focus:ring-1 focus:ring-primary/30 outline-none transition-colors">
+                    <svg class="w-4 h-4 text-slate-400 absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </div>
+                <button @click="openModal('misc')" class="bg-primary hover:bg-blue-700 text-white px-4 py-2 rounded text-xs font-medium transition-colors whitespace-nowrap">
                     + Add Jenis Project
                 </button>
             </div>
@@ -378,8 +370,14 @@
                             <th class="px-4 py-3 text-right text-[10px] font-bold text-primary uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-100 text-sm">
-                        <template x-for="item in miscs" :key="item.id">
+                    <tbody class="divide-y divide-slate-100 text-xs">
+                        <template x-if="isLoading">
+                            <tr><td colspan="4" class="px-4 py-8 text-center text-slate-400 text-xs">Loading data...</td></tr>
+                        </template>
+                        <template x-if="!isLoading && filteredData.length === 0">
+                            <tr><td colspan="4" class="px-4 py-8 text-center text-slate-400 text-xs">No data found.</td></tr>
+                        </template>
+                        <template x-for="item in filteredData" :key="item.id">
                             <tr class="hover:bg-slate-50">
                                 <td class="px-4 py-3 text-slate-800 font-medium" x-text="item.value"></td>
                                 <td class="px-4 py-3 text-slate-500 text-xs uppercase" x-text="item.type"></td>
