@@ -73,7 +73,7 @@
              x-transition:leave="transition-opacity ease-linear duration-300"
              x-transition:leave-start="opacity-100"
              x-transition:leave-end="opacity-0"
-             class="fixed inset-0 bg-slate-900 bg-opacity-50" @click="mobileMenuOpen = false"></div>
+             class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs" @click="mobileMenuOpen = false"></div>
 
         <div class="fixed inset-0 flex z-50">
             <!-- Sidebar panel -->

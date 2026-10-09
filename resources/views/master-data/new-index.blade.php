@@ -399,103 +399,120 @@
     </div>
 
     <!-- Reusable Modal Form -->
-    <div x-show="isModalOpen" x-cloak class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div x-show="isModalOpen" class="fixed inset-0 bg-slate-900 bg-opacity-50 transition-opacity" @click="isModalOpen = false"></div>
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            <div x-show="isModalOpen" class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <h3 class="text-lg leading-6 font-medium text-slate-900 mb-4" x-text="(formData.id ? 'Edit ' : 'Add New ') + modalType"></h3>
-                    
-                    <div x-show="errorMsg" class="mb-4 bg-red-50 text-red-600 p-3 rounded text-xs" x-text="errorMsg"></div>
+    <div x-show="isModalOpen" x-cloak class="relative z-50" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div x-show="isModalOpen" 
+             x-transition:enter="ease-out duration-200" 
+             x-transition:enter-start="opacity-0" 
+             x-transition:enter-end="opacity-100" 
+             x-transition:leave="ease-in duration-150" 
+             x-transition:leave-start="opacity-100" 
+             x-transition:leave-end="opacity-0" 
+             class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs transition-opacity" 
+             @click="isModalOpen = false"></div>
 
-                    <form @submit.prevent="submitForm">
+        <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+            <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                <div x-show="isModalOpen" 
+                     x-transition:enter="ease-out duration-200" 
+                     x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" 
+                     x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" 
+                     x-transition:leave="ease-in duration-150" 
+                     x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" 
+                     x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" 
+                     class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                        <h3 class="text-lg leading-6 font-medium text-slate-900 mb-4" x-text="(formData.id ? 'Edit ' : 'Add New ') + modalType"></h3>
                         
-                        <!-- Common Name Field -->
-                        <template x-if="modalType !== 'misc'">
-                            <div class="mb-4">
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Name *</label>
-                                <input type="text" x-model="formData.name" required class="w-full border border-slate-300 rounded px-4 py-2.5 text-sm focus:border-primary outline-none">
-                            </div>
-                        </template>
+                        <div x-show="errorMsg" class="mb-4 bg-red-50 text-red-600 p-3 rounded text-xs" x-text="errorMsg"></div>
+
+                        <form @submit.prevent="submitForm">
+                            
+                            <!-- Common Name Field -->
+                            <template x-if="modalType !== 'misc'">
+                                <div class="mb-4">
+                                    <label class="block text-xs font-medium text-slate-700 mb-1">Name *</label>
+                                    <input type="text" x-model="formData.name" required class="w-full border border-slate-300 rounded px-4 py-2.5 text-sm focus:border-primary outline-none">
+                                </div>
+                            </template>
 
 
-                        <!-- Managers Only -->
-                        <template x-if="modalType === 'managers'">
-                            <div class="space-y-4">
-                                <div>
-                                    <label class="block text-xs font-medium text-slate-700 mb-1">Type *</label>
-                                    <select x-model="formData.type" required class="w-full border border-slate-300 rounded px-4 py-2.5 text-sm focus:border-primary outline-none">
-                                        <option value="AM">Account Manager (AM)</option>
-                                        <option value="PM">Project Manager (PM)</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-slate-700 mb-1">Email * (for login)</label>
-                                    <input type="email" x-model="formData.email" required class="w-full border border-slate-300 rounded px-4 py-2.5 text-sm focus:border-primary outline-none">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-slate-700 mb-1" x-text="formData.id ? 'Password (leave blank to keep current)' : 'Password *'"></label>
-                                    <input type="password" x-model="formData.password" :required="!formData.id" class="w-full border border-slate-300 rounded px-4 py-2.5 text-sm focus:border-primary outline-none" placeholder="Min 6 chars">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-slate-700 mb-1">Phone</label>
-                                    <input type="text" x-model="formData.phone" class="w-full border border-slate-300 rounded px-4 py-2.5 text-sm focus:border-primary outline-none">
-                                </div>
-                            </div>
-                        </template>
-
-                        <!-- Customers/Subkons/Bowheers Only -->
-                        <template x-if="['customers', 'subkons', 'bowheers'].includes(modalType)">
-                            <div class="space-y-4">
-                                <div>
-                                    <label class="block text-xs font-medium text-slate-700 mb-1">PIC (Person In Charge)</label>
-                                    <input type="text" x-model="formData.pic" class="w-full border border-slate-300 rounded px-4 py-2.5 text-sm focus:border-primary outline-none">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-slate-700 mb-1">Email</label>
-                                    <input type="email" x-model="formData.email" class="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:border-primary outline-none">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-slate-700 mb-1">No HP</label>
-                                    <input type="text" x-model="formData.phone" class="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:border-primary outline-none">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-slate-700 mb-1">Address</label>
-                                    <textarea x-model="formData.address" class="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:border-primary outline-none"></textarea>
-                                </div>
-                            </div>
-                        </template>
-
-                        <!-- Misc Only -->
-                        <template x-if="modalType === 'misc'">
-                            <div class="space-y-4">
-                                <div>
-                                    <label class="block text-xs font-medium text-slate-700 mb-1">Value * (e.g. Last Mile)</label>
-                                    <input type="text" x-model="formData.value" required class="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:border-primary outline-none">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-slate-700 mb-1">Type *</label>
-                                    <div wire:ignore>
-                                        <select x-init="initMiscTypeSelect($el)" x-model="formData.type" required class="w-full" placeholder="Select or type a new one..."></select>
+                            <!-- Managers Only -->
+                            <template x-if="modalType === 'managers'">
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-xs font-medium text-slate-700 mb-1">Type *</label>
+                                        <select x-model="formData.type" required class="w-full border border-slate-300 rounded px-4 py-2.5 text-sm focus:border-primary outline-none">
+                                            <option value="AM">Account Manager (AM)</option>
+                                            <option value="PM">Project Manager (PM)</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-slate-700 mb-1">Email * (for login)</label>
+                                        <input type="email" x-model="formData.email" required class="w-full border border-slate-300 rounded px-4 py-2.5 text-sm focus:border-primary outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-slate-700 mb-1" x-text="formData.id ? 'Password (leave blank to keep current)' : 'Password *'"></label>
+                                        <input type="password" x-model="formData.password" :required="!formData.id" class="w-full border border-slate-300 rounded px-4 py-2.5 text-sm focus:border-primary outline-none" placeholder="Min 6 chars">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-slate-700 mb-1">Phone</label>
+                                        <input type="text" x-model="formData.phone" class="w-full border border-slate-300 rounded px-4 py-2.5 text-sm focus:border-primary outline-none">
                                     </div>
                                 </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-slate-700 mb-1">Display Order</label>
-                                    <input type="number" x-model="formData.display_order" class="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:border-primary outline-none" value="0">
-                                </div>
-                            </div>
-                        </template>
+                            </template>
 
-                        <div class="mt-5 sm:mt-6 sm:flex sm:flex-row-reverse">
-                            <button type="submit" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary text-base font-medium text-white hover:bg-blue-700 sm:ml-3 sm:w-auto sm:text-sm">
-                                Save
-                            </button>
-                            <button type="button" @click="isModalOpen = false" class="mt-3 w-full inline-flex justify-center rounded-md border border-slate-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-slate-700 hover:bg-slate-50 sm:mt-0 sm:w-auto sm:text-sm">
-                                Cancel
-                            </button>
-                        </div>
-                    </form>
+                            <!-- Customers/Subkons/Bowheers Only -->
+                            <template x-if="['customers', 'subkons', 'bowheers'].includes(modalType)">
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-xs font-medium text-slate-700 mb-1">PIC (Person In Charge)</label>
+                                        <input type="text" x-model="formData.pic" class="w-full border border-slate-300 rounded px-4 py-2.5 text-sm focus:border-primary outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-slate-700 mb-1">Email</label>
+                                        <input type="email" x-model="formData.email" class="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:border-primary outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-slate-700 mb-1">No HP</label>
+                                        <input type="text" x-model="formData.phone" class="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:border-primary outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-slate-700 mb-1">Address</label>
+                                        <textarea x-model="formData.address" class="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:border-primary outline-none"></textarea>
+                                    </div>
+                                </div>
+                            </template>
+
+                            <!-- Misc Only -->
+                            <template x-if="modalType === 'misc'">
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-xs font-medium text-slate-700 mb-1">Value * (e.g. Last Mile)</label>
+                                        <input type="text" x-model="formData.value" required class="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:border-primary outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-slate-700 mb-1">Type *</label>
+                                        <div wire:ignore>
+                                            <select x-init="initMiscTypeSelect($el)" x-model="formData.type" required class="w-full" placeholder="Select or type a new one..."></select>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-slate-700 mb-1">Display Order</label>
+                                        <input type="number" x-model="formData.display_order" class="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:border-primary outline-none" value="0">
+                                    </div>
+                                </div>
+                            </template>
+
+                            <div class="mt-5 sm:mt-6 sm:flex sm:flex-row-reverse">
+                                <button type="submit" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary text-base font-medium text-white hover:bg-blue-700 sm:ml-3 sm:w-auto sm:text-sm">
+                                    Save
+                                </button>
+                                <button type="button" @click="isModalOpen = false" class="mt-3 w-full inline-flex justify-center rounded-md border border-slate-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-slate-700 hover:bg-slate-50 sm:mt-0 sm:w-auto sm:text-sm">
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>

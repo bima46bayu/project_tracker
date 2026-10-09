@@ -253,36 +253,51 @@
     </div>
 
     <!-- LOCK / UNLOCK PLAN VALIDATION MODAL -->
-    <div x-show="showLockPlanModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div x-show="showLockPlanModal" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 bg-slate-500 bg-opacity-75 transition-opacity" @click="showLockPlanModal = false"></div>
+    <div x-show="showLockPlanModal" x-cloak class="relative z-50" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div x-show="showLockPlanModal" 
+             x-transition:enter="ease-out duration-200" 
+             x-transition:enter-start="opacity-0" 
+             x-transition:enter-end="opacity-100" 
+             x-transition:leave="ease-in duration-150" 
+             x-transition:leave-start="opacity-100" 
+             x-transition:leave-end="opacity-0" 
+             class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs transition-opacity" 
+             @click="showLockPlanModal = false"></div>
 
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-
-            <div x-show="showLockPlanModal" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full p-6">
-                <div class="flex items-start space-x-4">
-                    <div class="flex-shrink-0 flex items-center justify-center h-10 w-10 rounded-full" :class="project.is_indirect_cost_locked ? 'bg-blue-100 text-blue-600' : 'bg-amber-100 text-amber-600'">
-                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-                        </svg>
+        <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+            <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                <div x-show="showLockPlanModal" 
+                     x-transition:enter="ease-out duration-200" 
+                     x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" 
+                     x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" 
+                     x-transition:leave="ease-in duration-150" 
+                     x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" 
+                     x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" 
+                     class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-md p-6">
+                    <div class="flex items-start space-x-4">
+                        <div class="flex-shrink-0 flex items-center justify-center h-10 w-10 rounded-full" :class="project.is_indirect_cost_locked ? 'bg-blue-100 text-blue-600' : 'bg-amber-100 text-amber-600'">
+                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-slate-800" x-text="project.is_indirect_cost_locked ? 'Buka Kunci Plan Indirect Cost?' : 'Kunci Plan Indirect Cost?'"></h3>
+                            <p class="text-xs text-slate-500 mt-2" x-show="!project.is_indirect_cost_locked">
+                                Mengunci Plan akan menonaktifkan pengeditan alokasi anggaran (Section 1), sehingga alokasi dana tidak sengaja terubah saat pencatatan pengeluaran riil.
+                            </p>
+                            <p class="text-xs text-slate-500 mt-2" x-show="project.is_indirect_cost_locked">
+                                Membuka kunci Plan akan mengizinkan Anda untuk mengubah kembali item alokasi anggaran pada Section 1.
+                            </p>
+                        </div>
                     </div>
-                    <div>
-                        <h3 class="text-base font-bold text-slate-800" x-text="project.is_indirect_cost_locked ? 'Buka Kunci Plan Indirect Cost?' : 'Kunci Plan Indirect Cost?'"></h3>
-                        <p class="text-xs text-slate-500 mt-2" x-show="!project.is_indirect_cost_locked">
-                            Mengunci Plan akan menonaktifkan pengeditan alokasi anggaran (Section 1), sehingga alokasi dana tidak sengaja terubah saat pencatatan pengeluaran riil.
-                        </p>
-                        <p class="text-xs text-slate-500 mt-2" x-show="project.is_indirect_cost_locked">
-                            Membuka kunci Plan akan mengizinkan Anda untuk mengubah kembali item alokasi anggaran pada Section 1.
-                        </p>
+                    <div class="mt-6 flex justify-end space-x-3">
+                        <button @click="showLockPlanModal = false" class="px-4 py-2 border border-slate-300 rounded text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors">
+                            Batal
+                        </button>
+                        <button @click="toggleLockPlan()" class="px-4 py-2 rounded text-xs font-semibold text-white transition-colors" :class="project.is_indirect_cost_locked ? 'bg-primary hover:bg-blue-700' : 'bg-amber-600 hover:bg-amber-700'">
+                            <span x-text="project.is_indirect_cost_locked ? 'Ya, Buka Kunci' : 'Ya, Kunci Plan'"></span>
+                        </button>
                     </div>
-                </div>
-                <div class="mt-6 flex justify-end space-x-3">
-                    <button @click="showLockPlanModal = false" class="px-4 py-2 border border-slate-300 rounded text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors">
-                        Batal
-                    </button>
-                    <button @click="toggleLockPlan()" class="px-4 py-2 rounded text-xs font-semibold text-white transition-colors" :class="project.is_indirect_cost_locked ? 'bg-primary hover:bg-blue-700' : 'bg-amber-600 hover:bg-amber-700'">
-                        <span x-text="project.is_indirect_cost_locked ? 'Ya, Buka Kunci' : 'Ya, Kunci Plan'"></span>
-                    </button>
                 </div>
             </div>
         </div>

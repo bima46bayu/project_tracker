@@ -105,7 +105,7 @@
     <div x-show="showTaskSlideover" x-cloak class="fixed inset-0 z-50 overflow-hidden" aria-labelledby="slide-over-title" role="dialog" aria-modal="true">
         <div class="absolute inset-0 overflow-hidden">
             <!-- Background overlay -->
-            <div x-show="showTaskSlideover" @click="closeSlideover()" x-transition.opacity.duration.300ms class="absolute inset-0 bg-slate-900 bg-opacity-30 backdrop-blur-sm transition-opacity" aria-hidden="true"></div>
+            <div x-show="showTaskSlideover" @click="closeSlideover()" x-transition.opacity.duration.300ms class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity" aria-hidden="true"></div>
 
             <div class="fixed inset-y-0 right-0 max-w-full flex">
                 <!-- Slide-over panel -->

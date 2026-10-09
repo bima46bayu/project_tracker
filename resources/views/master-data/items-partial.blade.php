@@ -23,48 +23,63 @@
     </div>
 
     <!-- Modal -->
-    <div x-show="isModalOpen" x-cloak class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div x-show="isModalOpen" @click="isModalOpen = false" class="fixed inset-0 bg-slate-900 bg-opacity-50 transition-opacity"></div>
+    <div x-show="isModalOpen" x-cloak class="relative z-50" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div x-show="isModalOpen" 
+             x-transition:enter="ease-out duration-200" 
+             x-transition:enter-start="opacity-0" 
+             x-transition:enter-end="opacity-100" 
+             x-transition:leave="ease-in duration-150" 
+             x-transition:leave-start="opacity-100" 
+             x-transition:leave-end="opacity-0" 
+             class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs transition-opacity" 
+             @click="isModalOpen = false"></div>
 
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-
-            <div x-show="isModalOpen" class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <h3 class="text-lg leading-6 font-medium text-slate-900" id="modal-title" x-text="editId ? 'Edit Item' : 'Add New Item'"></h3>
-                    
-                    <form :action="formAction" method="POST" class="mt-4 space-y-4">
-                        @csrf
-                        <template x-if="editId">
-                            <input type="hidden" name="_method" value="PUT">
-                        </template>
-                        <div>
-                            <label class="block text-xs font-medium text-slate-700 mb-1">Item Name</label>
-                            <input type="text" name="name" x-model="formData.name" placeholder="e.g. Semen" required class="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:border-primary outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-slate-700 mb-1">Unit</label>
-                            <input type="text" name="satuan" x-model="formData.satuan" placeholder="e.g. Sak" required class="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:border-primary outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-slate-700 mb-1">Category</label>
-                            <select name="master_category_id" x-model="formData.master_category_id" required class="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:border-primary outline-none bg-white">
-                                <option value="">Select Category...</option>
-                                @foreach($categories as $category)
-                                    <option value="{{ $category->id }}">{{ $category->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
+        <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+            <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                <div x-show="isModalOpen" 
+                     x-transition:enter="ease-out duration-200" 
+                     x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" 
+                     x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" 
+                     x-transition:leave="ease-in duration-150" 
+                     x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" 
+                     x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" 
+                     class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                        <h3 class="text-lg leading-6 font-medium text-slate-900" id="modal-title" x-text="editId ? 'Edit Item' : 'Add New Item'"></h3>
                         
-                        <div class="mt-5 sm:mt-6 sm:flex sm:flex-row-reverse">
-                            <button type="submit" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary text-base font-medium text-white hover:bg-blue-700 sm:ml-3 sm:w-auto sm:text-sm">
-                                Save
-                            </button>
-                            <button type="button" @click="isModalOpen = false" class="mt-3 w-full inline-flex justify-center rounded-md border border-slate-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-slate-700 hover:bg-slate-50 sm:mt-0 sm:w-auto sm:text-sm">
-                                Cancel
-                            </button>
-                        </div>
-                    </form>
+                        <form :action="formAction" method="POST" class="mt-4 space-y-4">
+                            @csrf
+                            <template x-if="editId">
+                                <input type="hidden" name="_method" value="PUT">
+                            </template>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Item Name</label>
+                                <input type="text" name="name" x-model="formData.name" placeholder="e.g. Semen" required class="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:border-primary outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Unit</label>
+                                <input type="text" name="satuan" x-model="formData.satuan" placeholder="e.g. Sak" required class="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:border-primary outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Category</label>
+                                <select name="master_category_id" x-model="formData.master_category_id" required class="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:border-primary outline-none bg-white">
+                                    <option value="">Select Category...</option>
+                                    @foreach($categories as $category)
+                                        <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            
+                            <div class="mt-5 sm:mt-6 sm:flex sm:flex-row-reverse">
+                                <button type="submit" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary text-base font-medium text-white hover:bg-blue-700 sm:ml-3 sm:w-auto sm:text-sm">
+                                    Save
+                                </button>
+                                <button type="button" @click="isModalOpen = false" class="mt-3 w-full inline-flex justify-center rounded-md border border-slate-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-slate-700 hover:bg-slate-50 sm:mt-0 sm:w-auto sm:text-sm">
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
