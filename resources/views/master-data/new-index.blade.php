@@ -66,7 +66,12 @@
                 return data.filter(item => Object.values(item).some(val => val && String(val).toLowerCase().includes(q)));
             },
 
-            openModal(type) { this.modalType = type; this.formData = {}; this.errorMsg = ''; this.isModalOpen = true; },
+            openModal(type) { 
+                this.modalType = type; 
+                this.formData = type === 'managers' ? { type: 'AM' } : {}; 
+                this.errorMsg = ''; 
+                this.isModalOpen = true; 
+            },
             editItem(type, item) { this.modalType = type; this.formData = { ...item }; this.errorMsg = ''; this.isModalOpen = true; },
 
             submitForm() {
